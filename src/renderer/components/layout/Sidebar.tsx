@@ -11,7 +11,9 @@ import {
   SettingOutlined,
   BookOutlined,
   ClockCircleOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
+import GradeSetup from '../onboarding/GradeSetup';
 import { useAppStore } from '../../stores/appStore';
 import { SUBJECT_PRESET_COLORS } from '../../utils/constants';
 
@@ -25,6 +27,7 @@ const Sidebar: React.FC = () => {
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [gradeSetupOpen, setGradeSetupOpen] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState('');
   const [newSubjectColor, setNewSubjectColor] = useState(SUBJECT_PRESET_COLORS[0]);
 
@@ -132,7 +135,7 @@ const Sidebar: React.FC = () => {
         style={{ borderRight: 0, flex: 1, overflowY: 'auto' }}
       />
 
-      <div style={{ padding: '4px 16px' }}>
+      <div style={{ padding: '4px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
         <Button
           type="dashed"
           icon={<PlusOutlined />}
@@ -141,6 +144,15 @@ const Sidebar: React.FC = () => {
           onClick={() => setAddModalOpen(true)}
         >
           과목 추가
+        </Button>
+        <Button
+          type="primary"
+          icon={<ThunderboltOutlined />}
+          block
+          size="small"
+          onClick={() => setGradeSetupOpen(true)}
+        >
+          학년별 일괄 생성
         </Button>
       </div>
 
@@ -188,6 +200,15 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      <GradeSetup
+        open={gradeSetupOpen}
+        onClose={() => setGradeSetupOpen(false)}
+        onComplete={() => {
+          setGradeSetupOpen(false);
+          navigate('/kanban');
+        }}
+      />
     </div>
   );
 };

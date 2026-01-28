@@ -2,7 +2,7 @@
   "name": "study-log",
   "version": "1.0.0",
   "description": "Spaced repetition study tracker for students",
-  "main": "dist/main/index.js",
+  "main": "dist/main/main/index.js",
   "scripts": {
     "dev": "vite",
     "dev:electron": "npm run build:main && electron .",
