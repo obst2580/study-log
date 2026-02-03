@@ -1,0 +1,138 @@
+{
+  "name": "studylog",
+  "description": "StudyLog - Spaced repetition study tracker API",
+  "baseUrl": "http://localhost:3100",
+  "tools": [
+    {
+      "name": "studylog_get_subjects",
+      "description": "Get all study subjects",
+      "method": "GET",
+      "path": "/api/subjects"
+    },
+    {
+      "name": "studylog_create_subject",
+      "description": "Create a new study subject",
+      "method": "POST",
+      "path": "/api/subjects",
+      "parameters": {
+        "name": { "type": "string", "required": true, "description": "Subject name" },
+        "color": { "type": "string", "description": "Hex color code (default: #1890ff)" },
+        "icon": { "type": "string", "description": "Ant Design icon name (default: BookOutlined)" }
+      }
+    },
+    {
+      "name": "studylog_get_topics",
+      "description": "Get topics with optional filters",
+      "method": "GET",
+      "path": "/api/topics",
+      "parameters": {
+        "subjectId": { "type": "string", "description": "Filter by subject ID" },
+        "column": { "type": "string", "enum": ["today", "three_days", "one_week", "one_month", "done"], "description": "Filter by kanban column" },
+        "unitId": { "type": "string", "description": "Filter by unit ID" }
+      }
+    },
+    {
+      "name": "studylog_get_topic",
+      "description": "Get a specific topic with full details (checklist, links, sessions, reviews)",
+      "method": "GET",
+      "path": "/api/topics/{id}",
+      "parameters": {
+        "id": { "type": "string", "required": true, "description": "Topic ID" }
+      }
+    },
+    {
+      "name": "studylog_create_topic",
+      "description": "Create a new study topic (flashcard)",
+      "method": "POST",
+      "path": "/api/topics",
+      "parameters": {
+        "subjectId": { "type": "string", "required": true, "description": "Subject ID" },
+        "unitId": { "type": "string", "required": true, "description": "Unit ID" },
+        "title": { "type": "string", "required": true, "description": "Topic title" },
+        "notes": { "type": "string", "description": "Topic notes (markdown supported)" },
+        "difficulty": { "type": "string", "enum": ["high", "medium", "low"], "description": "Difficulty level" },
+        "importance": { "type": "string", "enum": ["high", "medium", "low"], "description": "Importance level" },
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Tags array" },
+        "column": { "type": "string", "enum": ["today", "three_days", "one_week", "one_month", "done"], "description": "Initial column (default: today)" }
+      }
+    },
+    {
+      "name": "studylog_advance_topic",
+      "description": "Move a topic to the next review stage (today -> 3days -> 1week -> 1month -> done)",
+      "method": "POST",
+      "path": "/api/topics/{id}/advance",
+      "parameters": {
+        "id": { "type": "string", "required": true, "description": "Topic ID" }
+      }
+    },
+    {
+      "name": "studylog_get_due_today",
+      "description": "Get all topics that are due for review today",
+      "method": "GET",
+      "path": "/api/reviews/due-today"
+    },
+    {
+      "name": "studylog_get_upcoming_reviews",
+      "description": "Get upcoming reviews sorted by review date",
+      "method": "GET",
+      "path": "/api/reviews/upcoming"
+    },
+    {
+      "name": "studylog_search",
+      "description": "Search topics by title, notes, or tags (full-text search)",
+      "method": "GET",
+      "path": "/api/search",
+      "parameters": {
+        "q": { "type": "string", "required": true, "description": "Search query" },
+        "subjectId": { "type": "string", "description": "Filter by subject ID" }
+      }
+    },
+    {
+      "name": "studylog_get_stats",
+      "description": "Get user stats (XP, streak)",
+      "method": "GET",
+      "path": "/api/stats"
+    },
+    {
+      "name": "studylog_get_mastery",
+      "description": "Get mastery ratio per subject (completed topics / total topics)",
+      "method": "GET",
+      "path": "/api/stats/mastery"
+    },
+    {
+      "name": "studylog_create_study_session",
+      "description": "Record a study session",
+      "method": "POST",
+      "path": "/api/study-sessions",
+      "parameters": {
+        "topicId": { "type": "string", "required": true, "description": "Topic ID" },
+        "startedAt": { "type": "string", "required": true, "description": "ISO timestamp when session started" },
+        "endedAt": { "type": "string", "required": true, "description": "ISO timestamp when session ended" },
+        "duration": { "type": "integer", "required": true, "description": "Duration in seconds" },
+        "timerType": { "type": "string", "enum": ["pomodoro", "stopwatch"], "description": "Timer type used" }
+      }
+    },
+    {
+      "name": "studylog_get_daily_counts",
+      "description": "Get study session counts by day",
+      "method": "GET",
+      "path": "/api/study-sessions/daily-counts",
+      "parameters": {
+        "startDate": { "type": "string", "required": true, "description": "Start date (YYYY-MM-DD)" },
+        "endDate": { "type": "string", "required": true, "description": "End date (YYYY-MM-DD)" }
+      }
+    },
+    {
+      "name": "studylog_export_backup",
+      "description": "Export all data as JSON backup",
+      "method": "GET",
+      "path": "/api/backup/export"
+    },
+    {
+      "name": "studylog_health",
+      "description": "Check API health status",
+      "method": "GET",
+      "path": "/api/health"
+    }
+  ]
+}
