@@ -6,10 +6,13 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = Router();
 
-// GET /api/subjects - Get all subjects
-router.get('/', asyncHandler(async (_req, res) => {
+// GET /api/subjects - Get all subjects for current user
+router.get('/', asyncHandler(async (req, res) => {
   const pool = getPool();
-  const { rows } = await pool.query('SELECT * FROM subjects ORDER BY sort_order ASC');
+  const { rows } = await pool.query(
+    'SELECT * FROM subjects WHERE user_id = $1 ORDER BY sort_order ASC',
+    [req.userId]
+  );
   res.json(rows.map(mapSubject));
 }));
 
@@ -29,8 +32,8 @@ router.post('/', asyncHandler(async (req, res) => {
   );
 
   await pool.query(
-    'INSERT INTO subjects (id, name, color, icon, sort_order) VALUES ($1, $2, $3, $4, $5)',
-    [id, name, color ?? '#1890ff', icon ?? 'BookOutlined', maxOrder.rows[0].next_order]
+    'INSERT INTO subjects (id, name, color, icon, sort_order, user_id) VALUES ($1, $2, $3, $4, $5, $6)',
+    [id, name, color ?? '#1890ff', icon ?? 'BookOutlined', maxOrder.rows[0].next_order, req.userId]
   );
 
   const { rows } = await pool.query('SELECT * FROM subjects WHERE id = $1', [id]);

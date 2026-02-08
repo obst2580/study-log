@@ -7,6 +7,7 @@ interface SelfEvalState {
   topicId: string | null;
   topicTitle: string;
   fromColumn: KanbanColumn;
+  masteryCount: number;
 }
 
 interface KanbanState {
@@ -39,6 +40,7 @@ const INITIAL_SELF_EVAL: SelfEvalState = {
   topicId: null,
   topicTitle: '',
   fromColumn: 'today',
+  masteryCount: 0,
 };
 
 export const useKanbanStore = create<KanbanState>((set, get) => ({
@@ -52,7 +54,9 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   selfEval: { ...INITIAL_SELF_EVAL },
 
   openSelfEval: (topicId, topicTitle, fromColumn) => {
-    set({ selfEval: { open: true, topicId, topicTitle, fromColumn } });
+    const topic = get().topics.find((t) => t.id === topicId);
+    const masteryCount = topic?.masteryCount ?? 0;
+    set({ selfEval: { open: true, topicId, topicTitle, fromColumn, masteryCount } });
   },
 
   closeSelfEval: () => {

@@ -16,6 +16,8 @@ export type {
   TopicWithRelations,
   DailyStudyCount,
   SubjectMastery,
+  UnitWithProgress,
+  SubjectWithProgress,
 } from '../../shared/types';
 
 export { KANBAN_COLUMNS } from '../../shared/types';

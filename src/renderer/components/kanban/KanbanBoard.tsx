@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -11,8 +11,15 @@ import {
   closestCenter,
 } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Button, Select, Space, Spin, Empty, Progress, Collapse, Tag } from 'antd';
-import { PlusOutlined, BookOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { Button, Select, Space, Spin, Card, Row, Col, Statistic, Collapse, Tag, Tooltip } from 'antd';
+import {
+  PlusOutlined,
+  BookOutlined,
+  CheckCircleOutlined,
+  InboxOutlined,
+  ClockCircleOutlined,
+  ArrowRightOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import KanbanCard from './KanbanCard';
 import CardDetail from '../card/CardDetail';
@@ -21,7 +28,35 @@ import SelfEvalModal from '../review/SelfEvalModal';
 import { useKanbanStore } from '../../stores/kanbanStore';
 import { useAppStore } from '../../stores/appStore';
 import { apiService } from '../../api/apiService';
-import type { KanbanColumn as KanbanColumnType, Topic, CurriculumProgress } from '../../types';
+import type { Topic } from '../../types';
+import type { CurriculumProgress } from '../../../shared/types';
+
+// -- Status Overview Card Styles --
+
+const STATUS_CARD_STYLES = {
+  backlog: {
+    background: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
+    iconColor: '#8c8c8c',
+    borderColor: '#d9d9d9',
+  },
+  today: {
+    background: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)',
+    iconColor: '#1890ff',
+    borderColor: '#91d5ff',
+  },
+  reviewing: {
+    background: 'linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%)',
+    iconColor: '#722ed1',
+    borderColor: '#d3adf7',
+  },
+  mastered: {
+    background: 'linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%)',
+    iconColor: '#52c41a',
+    borderColor: '#b7eb8f',
+  },
+} as const;
+
+// -- Component --
 
 const KanbanBoard: React.FC = () => {
   const navigate = useNavigate();
@@ -111,14 +146,138 @@ const KanbanBoard: React.FC = () => {
   };
 
   const showSubjectFilter = !selectedSubjectId && subjects.length > 0;
-  const progressPercent = curriculumProgress?.progressPercent ?? 0;
+
+  // Derived counts for status overview
+  const backlogCount = curriculumProgress?.backlogCount ?? 0;
+  const todayCount = dailyProgress?.totalToday ?? todayTopics.length;
+  const reviewingCount = dailyProgress?.reviewingCount ?? 0;
+  const masteredCount = curriculumProgress?.masteredCount ?? 0;
+
+  const hasNoTodayContent = todayTopics.length === 0 && completedToday.length === 0;
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} role="region" aria-label="오늘 학습">
-      {/* Toolbar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+
+      {/* -- Status Overview Cards -- */}
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} sm={6}>
+          <Card
+            hoverable
+            size="small"
+            style={{
+              background: STATUS_CARD_STYLES.backlog.background,
+              border: `1px solid ${STATUS_CARD_STYLES.backlog.borderColor}`,
+              borderRadius: 10,
+              cursor: 'pointer',
+            }}
+            styles={{ body: { padding: '12px 16px' } }}
+            onClick={() => navigate('/curriculum')}
+          >
+            <Statistic
+              title={
+                <span style={{ fontSize: 12, color: '#595959' }}>
+                  <InboxOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.backlog.iconColor }} />
+                  백로그
+                </span>
+              }
+              value={backlogCount}
+              suffix="장"
+              valueStyle={{ fontSize: 22, fontWeight: 700, color: '#595959' }}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={12} sm={6}>
+          <Card
+            size="small"
+            style={{
+              background: STATUS_CARD_STYLES.today.background,
+              border: `1px solid ${STATUS_CARD_STYLES.today.borderColor}`,
+              borderRadius: 10,
+            }}
+            styles={{ body: { padding: '12px 16px' } }}
+          >
+            <Statistic
+              title={
+                <span style={{ fontSize: 12, color: '#096dd9' }}>
+                  <BookOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.today.iconColor }} />
+                  오늘 학습
+                </span>
+              }
+              value={todayCount}
+              suffix={
+                <span style={{ fontSize: 13, color: '#1890ff' }}>
+                  {dailyProgress ? ` (${dailyProgress.completedToday}완료)` : ''}
+                </span>
+              }
+              valueStyle={{ fontSize: 22, fontWeight: 700, color: '#1890ff' }}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={12} sm={6}>
+          <Card
+            size="small"
+            style={{
+              background: STATUS_CARD_STYLES.reviewing.background,
+              border: `1px solid ${STATUS_CARD_STYLES.reviewing.borderColor}`,
+              borderRadius: 10,
+            }}
+            styles={{ body: { padding: '12px 16px' } }}
+          >
+            <Statistic
+              title={
+                <span style={{ fontSize: 12, color: '#531dab' }}>
+                  <ClockCircleOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.reviewing.iconColor }} />
+                  복습 대기
+                </span>
+              }
+              value={reviewingCount}
+              suffix="장"
+              valueStyle={{ fontSize: 22, fontWeight: 700, color: '#722ed1' }}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={12} sm={6}>
+          <Tooltip title="학습 완료 후 마스터한 주제 수">
+            <Card
+              size="small"
+              style={{
+                background: STATUS_CARD_STYLES.mastered.background,
+                border: `1px solid ${STATUS_CARD_STYLES.mastered.borderColor}`,
+                borderRadius: 10,
+              }}
+              styles={{ body: { padding: '12px 16px' } }}
+            >
+              <Statistic
+                title={
+                  <span style={{ fontSize: 12, color: '#389e0d' }}>
+                    <CheckCircleOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.mastered.iconColor }} />
+                    마스터
+                  </span>
+                }
+                value={masteredCount}
+                suffix="장"
+                valueStyle={{ fontSize: 22, fontWeight: 700, color: '#52c41a' }}
+              />
+            </Card>
+          </Tooltip>
+        </Col>
+      </Row>
+
+      {/* -- Today's Cards Section Header -- */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        marginBottom: 12, flexWrap: 'wrap', gap: 8,
+      }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>오늘 학습</h2>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>
+            오늘 학습
+            <span style={{ fontWeight: 400, fontSize: 13, color: '#8c8c8c', marginLeft: 6 }}>
+              ({todayTopics.length}장)
+            </span>
+          </h2>
           <Space size={4} wrap>
             {showSubjectFilter && (
               <Select
@@ -142,43 +301,72 @@ const KanbanBoard: React.FC = () => {
             />
           </Space>
         </div>
-        <Space>
-          <Button icon={<BookOutlined />} onClick={() => navigate('/curriculum')}>
-            커리큘럼 관리
-          </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setFormOpen(true)}>
-            카드 추가
-          </Button>
-        </Space>
+        <Button type="primary" icon={<PlusOutlined />} size="small" onClick={() => setFormOpen(true)}>
+          카드 추가
+        </Button>
       </div>
 
-      {/* Progress Summary */}
-      <div style={{ marginBottom: 12, padding: '8px 12px', background: 'var(--bg-secondary, #fafafa)', borderRadius: 8, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
-        <span>
-          완료 <strong>{dailyProgress?.completedToday ?? 0}</strong>/{dailyProgress?.totalToday ?? todayTopics.length}
-        </span>
-        <span>
-          복습대기 <strong>{dailyProgress?.reviewingCount ?? 0}</strong>장
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          전체 진도
-          <Progress percent={progressPercent} size="small" style={{ width: 100, margin: 0 }} />
-        </span>
-      </div>
-
-      {/* Board */}
+      {/* -- Board Content -- */}
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
           <Spin size="large" tip="로딩 중..." />
         </div>
-      ) : todayTopics.length === 0 && completedToday.length === 0 ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12 }}>
-          <Empty description="오늘 학습할 주제가 없습니다" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-          <Button type="primary" icon={<BookOutlined />} onClick={() => navigate('/curriculum')}>
-            커리큘럼에서 오늘 학습할 주제를 추가하세요
-          </Button>
+      ) : hasNoTodayContent ? (
+        /* -- Empty State -- */
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Card
+            style={{
+              maxWidth: 420,
+              width: '100%',
+              textAlign: 'center',
+              borderRadius: 12,
+              border: '1px dashed #d9d9d9',
+            }}
+            styles={{ body: { padding: '32px 24px' } }}
+          >
+            <BookOutlined style={{ fontSize: 40, color: '#bfbfbf', marginBottom: 16 }} />
+            <h3 style={{ margin: '0 0 20px', fontSize: 16, fontWeight: 600, color: '#262626' }}>
+              오늘 학습할 주제가 없습니다
+            </h3>
+            <div style={{ textAlign: 'left', marginBottom: 24 }}>
+              {[
+                { step: '1', text: '커리큘럼에서 공부할 주제를 선택하세요' },
+                { step: '2', text: '선택한 주제가 여기에 표시됩니다' },
+                { step: '3', text: '학습 완료 후 자기평가를 진행합니다' },
+              ].map(({ step, text }) => (
+                <div
+                  key={step}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 0',
+                    borderBottom: step !== '3' ? '1px solid #f0f0f0' : 'none',
+                  }}
+                >
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: '#e6f7ff', color: '#1890ff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13, fontWeight: 600, flexShrink: 0,
+                  }}>
+                    {step}
+                  </div>
+                  <span style={{ fontSize: 13, color: '#595959' }}>{text}</span>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="primary"
+              size="large"
+              icon={<ArrowRightOutlined />}
+              onClick={() => navigate('/curriculum')}
+              style={{ borderRadius: 8 }}
+            >
+              커리큘럼에서 추가하기
+            </Button>
+          </Card>
         </div>
       ) : (
+        /* -- Today's Cards + Completed -- */
         <div style={{ flex: 1, overflowY: 'auto' }}>
           <DndContext
             sensors={sensors}
@@ -186,9 +374,6 @@ const KanbanBoard: React.FC = () => {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div style={{ marginBottom: 8, fontWeight: 500, fontSize: 14, color: '#666' }}>
-              오늘 학습 ({todayTopics.length}장)
-            </div>
             <SortableContext items={todayTopics.map((t) => t.id)} strategy={verticalListSortingStrategy}>
               {todayTopics.map((topic) => {
                 const subject = subjects.find((s) => s.id === topic.subjectId);
@@ -217,15 +402,20 @@ const KanbanBoard: React.FC = () => {
             </DragOverlay>
           </DndContext>
 
-          {/* Completed Today */}
+          {/* -- Completed Today -- */}
           {completedToday.length > 0 && (
             <Collapse
               ghost
-              style={{ marginTop: 16 }}
+              style={{
+                marginTop: 16,
+                background: '#f6ffed',
+                borderRadius: 8,
+                border: '1px solid #b7eb8f',
+              }}
               items={[{
                 key: 'completed',
                 label: (
-                  <span style={{ fontWeight: 500, fontSize: 14, color: '#52c41a' }}>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: '#389e0d' }}>
                     <CheckCircleOutlined style={{ marginRight: 6 }} />
                     오늘 완료 ({completedToday.length}장)
                   </span>
@@ -234,20 +424,35 @@ const KanbanBoard: React.FC = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {completedToday.map((topic) => {
                       const subject = subjects.find((s) => s.id === topic.subjectId);
-                      const score = (topic as Record<string, unknown>).understandingScore as number | undefined;
+                      const score = (topic as unknown as Record<string, unknown>).understandingScore as number | undefined;
                       return (
                         <div
                           key={topic.id}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 8,
-                            padding: '6px 12px', background: '#f6ffed', borderRadius: 6, cursor: 'pointer',
+                            padding: '6px 12px', background: '#ffffff', borderRadius: 6,
+                            cursor: 'pointer', border: '1px solid #d9f7be',
+                            transition: 'background 0.2s',
                           }}
                           onClick={() => handleCardClick(topic.id)}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#f6ffed'; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#ffffff'; }}
                         >
-                          <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                          <CheckCircleOutlined style={{ color: '#52c41a', flexShrink: 0 }} />
                           <span style={{ flex: 1, fontSize: 13 }}>{topic.title}</span>
-                          {subject && <Tag style={{ margin: 0, fontSize: 11 }} color={subject.color}>{subject.name}</Tag>}
-                          {score && <Tag style={{ margin: 0 }} color={score >= 4 ? 'green' : score >= 3 ? 'blue' : 'orange'}>이해도:{score}</Tag>}
+                          {subject && (
+                            <Tag style={{ margin: 0, fontSize: 11 }} color={subject.color}>
+                              {subject.name}
+                            </Tag>
+                          )}
+                          {score != null && (
+                            <Tag
+                              style={{ margin: 0 }}
+                              color={score >= 4 ? 'green' : score >= 3 ? 'blue' : 'orange'}
+                            >
+                              이해도:{score}
+                            </Tag>
+                          )}
                         </div>
                       );
                     })}
@@ -259,9 +464,10 @@ const KanbanBoard: React.FC = () => {
         </div>
       )}
 
+      {/* -- Modals (always rendered) -- */}
       <CardDetail topicId={detailTopicId} onClose={() => setDetailTopicId(null)} onEdit={handleEditCard} />
       <CardForm open={formOpen} onClose={handleFormClose} subjectId={selectedSubjectId} editTopicId={editTopicId} />
-      <SelfEvalModal open={selfEval.open} topicTitle={selfEval.topicTitle} onSubmit={submitSelfEval} onCancel={closeSelfEval} />
+      <SelfEvalModal open={selfEval.open} topicTitle={selfEval.topicTitle} masteryCount={selfEval.masteryCount} onSubmit={submitSelfEval} onCancel={closeSelfEval} />
     </div>
   );
 };
