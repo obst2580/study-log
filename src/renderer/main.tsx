@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider, theme as antTheme } from 'antd';
 import koKR from 'antd/locale/ko_KR';
 import App from './App';
@@ -21,9 +21,9 @@ function Root() {
         },
       }}
     >
-      <HashRouter>
+      <BrowserRouter>
         <App />
-      </HashRouter>
+      </BrowserRouter>
     </ConfigProvider>
   );
 }

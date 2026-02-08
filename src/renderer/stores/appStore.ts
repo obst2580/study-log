@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { apiService } from '../api/apiService';
 import type { Subject, AppSettings } from '../../shared/types';
 
 interface AppState {
@@ -35,9 +36,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setTheme: (theme) => {
     set({ theme });
     document.documentElement.setAttribute('data-theme', theme);
-    if (window.electronAPI) {
-      window.electronAPI.updateSettings({ theme });
-    }
+    apiService.updateSettings({ theme });
   },
 
   sidebarCollapsed: false,
@@ -46,9 +45,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   subjects: [],
   selectedSubjectId: null,
   loadSubjects: async () => {
-    if (!window.electronAPI) return;
     try {
-      const subjects = await window.electronAPI.getSubjects();
+      const subjects = await apiService.getSubjects();
       set({ subjects });
     } catch (err) {
       console.error('Failed to load subjects:', err);
@@ -64,12 +62,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   settings: {},
   loadSettings: async () => {
-    if (!window.electronAPI) return;
     try {
-      const settings = await window.electronAPI.getSettings();
+      const settings = await apiService.getSettings();
       if (settings) {
-        const s = settings as Record<string, unknown>;
-        const theme = (s.theme as 'light' | 'dark') ?? 'light';
+        const theme = settings.theme ?? 'light';
         set({ settings: settings as Partial<AppSettings>, theme });
         document.documentElement.setAttribute('data-theme', theme);
       }
@@ -78,9 +74,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
   updateSettings: async (newSettings) => {
-    if (!window.electronAPI) return;
     try {
-      const updated = await window.electronAPI.updateSettings(newSettings);
+      const updated = await apiService.updateSettings(newSettings);
       set({ settings: updated as Partial<AppSettings> });
     } catch (err) {
       console.error('Failed to update settings:', err);

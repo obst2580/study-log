@@ -4,6 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useAppStore } from '../../stores/appStore';
 import { useKanbanStore } from '../../stores/kanbanStore';
 import { useUnits, useTopicDetail } from '../../hooks/useDatabase';
+import { apiService } from '../../api/apiService';
 import type { Difficulty, Importance } from '../../types';
 
 interface CardFormProps {
@@ -61,8 +62,8 @@ const CardForm: React.FC<CardFormProps> = ({ open, onClose, subjectId, editTopic
   };
 
   const handleAddUnit = async () => {
-    if (!newUnitName.trim() || !selectedSubjectId || !window.electronAPI) return;
-    await window.electronAPI.createUnit({ subjectId: selectedSubjectId, name: newUnitName.trim() });
+    if (!newUnitName.trim() || !selectedSubjectId) return;
+    await apiService.createUnit({ subjectId: selectedSubjectId, name: newUnitName.trim() });
     setNewUnitName('');
     await refreshUnits();
   };

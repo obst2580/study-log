@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { apiService } from '../api/apiService';
 import type { TopicWithRelations, Subject, Unit, Exam, UserStats, SubjectMastery, DailyStudyCount } from '../../shared/types';
 
 /**
@@ -9,13 +10,13 @@ export function useTopicDetail(topicId: string | null) {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!topicId || !window.electronAPI) {
+    if (!topicId) {
       setTopic(null);
       return;
     }
     setLoading(true);
     try {
-      const result = await window.electronAPI.getTopicById(topicId);
+      const result = await apiService.getTopicById(topicId);
       setTopic(result as TopicWithRelations | null);
     } catch (err) {
       console.error('Failed to load topic:', err);
@@ -39,13 +40,13 @@ export function useUnits(subjectId: string | null) {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!subjectId || !window.electronAPI) {
+    if (!subjectId) {
       setUnits([]);
       return;
     }
     setLoading(true);
     try {
-      const result = await window.electronAPI.getUnits(subjectId);
+      const result = await apiService.getUnits(subjectId);
       setUnits(result as Unit[]);
     } catch (err) {
       console.error('Failed to load units:', err);
@@ -69,10 +70,9 @@ export function useUserStats() {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!window.electronAPI) return;
     setLoading(true);
     try {
-      const result = await window.electronAPI.getUserStats();
+      const result = await apiService.getUserStats();
       setStats(result as UserStats);
     } catch (err) {
       console.error('Failed to load stats:', err);
@@ -96,10 +96,9 @@ export function useSubjectMastery() {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!window.electronAPI) return;
     setLoading(true);
     try {
-      const result = await window.electronAPI.getSubjectMastery();
+      const result = await apiService.getSubjectMastery();
       setMastery(result as SubjectMastery[]);
     } catch (err) {
       console.error('Failed to load mastery:', err);
@@ -123,10 +122,9 @@ export function useDailyStudyCounts(startDate: string, endDate: string) {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!window.electronAPI) return;
     setLoading(true);
     try {
-      const result = await window.electronAPI.getDailyStudyCounts(startDate, endDate);
+      const result = await apiService.getDailyStudyCounts(startDate, endDate);
       setCounts(result as DailyStudyCount[]);
     } catch (err) {
       console.error('Failed to load daily counts:', err);
@@ -150,10 +148,9 @@ export function useExams() {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!window.electronAPI) return;
     setLoading(true);
     try {
-      const result = await window.electronAPI.getExams();
+      const result = await apiService.getExams();
       setExams(result as Exam[]);
     } catch (err) {
       console.error('Failed to load exams:', err);

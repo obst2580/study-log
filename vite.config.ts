@@ -5,7 +5,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   root: 'src/renderer',
-  base: './',
+  base: '/',
   build: {
     outDir: '../../dist/renderer',
     emptyOutDir: true,
@@ -18,5 +18,18 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3100',
+        bypass(req) {
+          if (req.url) {
+            const urlWithoutQuery = req.url.split('?')[0];
+            if (urlWithoutQuery.endsWith('.ts') || urlWithoutQuery.endsWith('.tsx')) {
+              return req.url;
+            }
+          }
+        },
+      },
+    },
   },
 });

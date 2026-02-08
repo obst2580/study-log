@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Checkbox, Input, Button, Space, List, Progress } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { apiService } from '../../api/apiService';
 import type { ChecklistItem } from '../../types';
 
 interface ChecklistProps {
@@ -17,8 +18,8 @@ const Checklist: React.FC<ChecklistProps> = ({ topicId, items, onUpdate }) => {
   const progressPercent = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   const handleAddItem = async () => {
-    if (!newItemText.trim() || !window.electronAPI) return;
-    await window.electronAPI.upsertChecklistItem({
+    if (!newItemText.trim()) return;
+    await apiService.upsertChecklistItem({
       topicId,
       text: newItemText.trim(),
       checked: false,
@@ -29,8 +30,7 @@ const Checklist: React.FC<ChecklistProps> = ({ topicId, items, onUpdate }) => {
   };
 
   const handleToggle = async (item: ChecklistItem) => {
-    if (!window.electronAPI) return;
-    await window.electronAPI.upsertChecklistItem({
+    await apiService.upsertChecklistItem({
       id: item.id,
       topicId,
       text: item.text,
@@ -41,8 +41,7 @@ const Checklist: React.FC<ChecklistProps> = ({ topicId, items, onUpdate }) => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.electronAPI) return;
-    await window.electronAPI.deleteChecklistItem(id);
+    await apiService.deleteChecklistItem(topicId, id);
     onUpdate();
   };
 

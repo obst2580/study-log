@@ -5,12 +5,25 @@ import {
   SunOutlined,
   MoonOutlined,
   ClockCircleOutlined,
-  RobotOutlined,
   DatabaseOutlined,
+  BookOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useAppStore } from '../../stores/appStore';
+import { apiService } from '../../api/apiService';
 
 const { Text } = Typography;
+
+const GRADES = [
+  { value: 'middle-1', label: '중학교 1학년' },
+  { value: 'middle-2', label: '중학교 2학년' },
+  { value: 'middle-3', label: '중학교 3학년' },
+  { value: 'high-1', label: '고등학교 1학년' },
+  { value: 'high-2', label: '고등학교 2학년 (문과)' },
+  { value: 'high-2-science', label: '고등학교 2학년 (이과)' },
+  { value: 'high-3', label: '고등학교 3학년 (문과)' },
+  { value: 'high-3-science', label: '고등학교 3학년 (이과)' },
+];
 
 const SettingsView: React.FC = () => {
   const [form] = Form.useForm();
@@ -18,7 +31,14 @@ const SettingsView: React.FC = () => {
   const updateSettings = useAppStore((s) => s.updateSettings);
   const theme = useAppStore((s) => s.theme);
   const setTheme = useAppStore((s) => s.setTheme);
+  const loadSubjects = useAppStore((s) => s.loadSubjects);
   const [saving, setSaving] = useState(false);
+
+  const [currGrade, setCurrGrade] = useState<string>('');
+  const [generating, setGenerating] = useState(false);
+  const [generatedTemplateId, setGeneratedTemplateId] = useState<string | null>(null);
+  const [templateStatus, setTemplateStatus] = useState<string>('');
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     if (settings) {
@@ -28,8 +48,6 @@ const SettingsView: React.FC = () => {
         pomodoroLongBreak: (settings.pomodoroLongBreak ?? 900) / 60,
         pomodoroCycles: settings.pomodoroCycles ?? 4,
         dailyGoal: settings.dailyGoal ?? 5,
-        llmProvider: settings.llmProvider ?? null,
-        llmModel: settings.llmModel ?? '',
       });
     }
   }, [settings, form]);
@@ -44,8 +62,6 @@ const SettingsView: React.FC = () => {
         pomodoroLongBreak: values.pomodoroLongBreak * 60,
         pomodoroCycles: values.pomodoroCycles,
         dailyGoal: values.dailyGoal,
-        llmProvider: values.llmProvider,
-        llmModel: values.llmModel,
       });
       message.success('설정이 저장되었습니다');
     } catch {
@@ -56,12 +72,66 @@ const SettingsView: React.FC = () => {
   };
 
   const handleExport = async () => {
-    if (!window.electronAPI) return;
     try {
-      await window.electronAPI.exportData();
+      const data = await apiService.exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `studylog-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       message.success('데이터가 내보내기되었습니다');
     } catch {
       message.error('내보내기 실패');
+    }
+  };
+
+  const handleGenerateCurriculum = async () => {
+    if (!currGrade) return;
+    setGenerating(true);
+    setTemplateStatus('generating');
+    try {
+      const result = await apiService.generateCurriculum(currGrade);
+      setGeneratedTemplateId(result.id);
+      if (result.status === 'active') {
+        setTemplateStatus('active');
+        setGenerating(false);
+        return;
+      }
+      // Poll for status
+      const poll = setInterval(async () => {
+        try {
+          const status = await apiService.getCurriculumStatus(result.id);
+          setTemplateStatus(status.status);
+          if (status.status === 'active' || status.status === 'archived') {
+            clearInterval(poll);
+            setGenerating(false);
+          }
+        } catch {
+          clearInterval(poll);
+          setGenerating(false);
+        }
+      }, 3000);
+    } catch {
+      message.error('커리큘럼 생성 실패');
+      setGenerating(false);
+    }
+  };
+
+  const handleApplyCurriculum = async () => {
+    if (!generatedTemplateId) return;
+    setApplying(true);
+    try {
+      await apiService.applyCurriculum(generatedTemplateId);
+      message.success('커리큘럼이 칸반 보드에 적용되었습니다');
+      loadSubjects();
+    } catch {
+      message.error('적용 실패');
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -126,31 +196,42 @@ const SettingsView: React.FC = () => {
         </Card>
 
         <Card
-          title={
-            <Space>
-              <RobotOutlined />
-              <span>AI 설정</span>
-            </Space>
-          }
+          title={<Space><BookOutlined /><span>커리큘럼 관리</span></Space>}
           size="small"
           style={{ marginBottom: 16 }}
         >
-          <Form.Item name="llmProvider" label="LLM 제공자">
+          <Space direction="vertical" style={{ width: '100%' }}>
             <Select
-              allowClear
-              placeholder="선택 안 함"
-              options={[
-                { label: 'OpenAI', value: 'openai' },
-                { label: 'Anthropic', value: 'anthropic' },
-              ]}
+              placeholder="학년 선택"
+              style={{ width: '100%' }}
+              value={currGrade || undefined}
+              onChange={setCurrGrade}
+              options={GRADES}
             />
-          </Form.Item>
-          <Form.Item name="llmModel" label="모델명">
-            <Input placeholder="예: gpt-4o-mini, claude-3.5-sonnet" />
-          </Form.Item>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            API 키는 로컬에 안전하게 저장됩니다.
-          </Text>
+            <Button
+              type="primary"
+              icon={<ThunderboltOutlined />}
+              loading={generating}
+              disabled={!currGrade}
+              onClick={handleGenerateCurriculum}
+              block
+            >
+              커리큘럼 생성
+            </Button>
+            {templateStatus === 'generating' && (
+              <Text type="secondary">AI가 교과과정을 생성 중입니다... (약 30초~1분)</Text>
+            )}
+            {templateStatus === 'active' && generatedTemplateId && (
+              <Button
+                type="primary"
+                loading={applying}
+                onClick={handleApplyCurriculum}
+                block
+              >
+                칸반 보드에 적용
+              </Button>
+            )}
+          </Space>
         </Card>
 
         <Card

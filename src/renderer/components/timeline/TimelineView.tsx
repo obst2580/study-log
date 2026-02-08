@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Timeline, Card, Tag, Select, Empty, Typography } from 'antd';
 import {
-  CheckCircleOutlined,
   ClockCircleOutlined,
-  SwapOutlined,
   CalendarOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAppStore } from '../../stores/appStore';
 import { useExams } from '../../hooks/useDatabase';
-import { COLUMN_LABELS, COLUMN_COLORS } from '../../utils/constants';
-import type { ReviewEntry, StudySession, Subject } from '../../types';
+import { apiService } from '../../api/apiService';
+import type { StudySession } from '../../types';
 
 const { Text } = Typography;
 
@@ -35,14 +33,24 @@ const TimelineView: React.FC = () => {
   }, [filterSubjectId]);
 
   const loadTimelineEvents = async () => {
-    if (!window.electronAPI) return;
-
     const allEvents: TimelineEvent[] = [];
+
+    // Get topic IDs for filtering if subject selected
+    let allowedTopicIds: Set<string> | null = null;
+    if (filterSubjectId) {
+      try {
+        const topics = await apiService.getTopicsBySubject(filterSubjectId) as { id: string }[];
+        allowedTopicIds = new Set(topics.map((t) => t.id));
+      } catch {
+        // If topics fetch fails, don't filter
+      }
+    }
 
     // Fetch recent study sessions
     try {
-      const sessions = await window.electronAPI.getStudySessions() as (StudySession & { topic_id?: string })[];
+      const sessions = await apiService.getStudySessions() as StudySession[];
       for (const s of sessions) {
+        if (allowedTopicIds && !allowedTopicIds.has(s.topicId)) continue;
         allEvents.push({
           id: `session-${s.id}`,
           type: 'session',
@@ -57,8 +65,9 @@ const TimelineView: React.FC = () => {
       // Sessions may not be loaded
     }
 
-    // Add exam events
+    // Add exam events (filter by subjectIds)
     for (const exam of exams) {
+      if (filterSubjectId && !exam.subjectIds?.includes(filterSubjectId)) continue;
       const daysUntil = dayjs(exam.date).diff(dayjs(), 'day');
       allEvents.push({
         id: `exam-${exam.id}`,

@@ -11,10 +11,17 @@ import {
   SettingOutlined,
   BookOutlined,
   ClockCircleOutlined,
-  ThunderboltOutlined,
+  TeamOutlined,
+  SwapOutlined,
+  FormOutlined,
+  StarOutlined,
+  BarChartOutlined,
+  FlagOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons';
-import GradeSetup from '../onboarding/GradeSetup';
 import { useAppStore } from '../../stores/appStore';
+import { useAuthStore } from '../../stores/authStore';
+import { apiService } from '../../api/apiService';
 import { SUBJECT_PRESET_COLORS } from '../../utils/constants';
 
 const Sidebar: React.FC = () => {
@@ -25,15 +32,17 @@ const Sidebar: React.FC = () => {
   const setSelectedSubject = useAppStore((s) => s.setSelectedSubject);
   const loadSubjects = useAppStore((s) => s.loadSubjects);
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
+  const { user, logout } = useAuthStore();
+
+  const isParent = user?.role === 'parent';
 
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [gradeSetupOpen, setGradeSetupOpen] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState('');
   const [newSubjectColor, setNewSubjectColor] = useState(SUBJECT_PRESET_COLORS[0]);
 
   const handleAddSubject = async () => {
-    if (!newSubjectName.trim() || !window.electronAPI) return;
-    await window.electronAPI.createSubject({
+    if (!newSubjectName.trim()) return;
+    await apiService.createSubject({
       name: newSubjectName.trim(),
       color: newSubjectColor,
     });
@@ -54,6 +63,11 @@ const Sidebar: React.FC = () => {
     { key: '/calendar', icon: <CalendarOutlined />, label: '달력' },
     { key: '/timeline', icon: <FieldTimeOutlined />, label: '타임라인' },
     { key: '/timer', icon: <ClockCircleOutlined />, label: '타이머' },
+    { key: '/reflection', icon: <FormOutlined />, label: '주간 성찰' },
+    { key: '/achievements', icon: <StarOutlined />, label: '업적' },
+    { key: '/report', icon: <BarChartOutlined />, label: '월간 리포트' },
+    { key: '/challenges', icon: <FlagOutlined />, label: '챌린지' },
+    { key: '/analysis', icon: <LineChartOutlined />, label: '학습 패턴' },
   ];
 
   const subjectItems = [
@@ -73,6 +87,7 @@ const Sidebar: React.FC = () => {
 
   const bottomItems = [
     { key: '/ai', icon: <RobotOutlined />, label: 'AI 채팅' },
+    ...(isParent ? [{ key: '/parent', icon: <TeamOutlined />, label: '보호자 대시보드' }] : []),
     { key: '/settings', icon: <SettingOutlined />, label: '설정' },
   ];
 
@@ -145,15 +160,6 @@ const Sidebar: React.FC = () => {
         >
           과목 추가
         </Button>
-        <Button
-          type="primary"
-          icon={<ThunderboltOutlined />}
-          block
-          size="small"
-          onClick={() => setGradeSetupOpen(true)}
-        >
-          학년별 일괄 생성
-        </Button>
       </div>
 
       <div style={{ borderTop: '1px solid var(--border-color, #f0f0f0)', marginTop: 8 }}>
@@ -201,14 +207,17 @@ const Sidebar: React.FC = () => {
         </div>
       </Modal>
 
-      <GradeSetup
-        open={gradeSetupOpen}
-        onClose={() => setGradeSetupOpen(false)}
-        onComplete={() => {
-          setGradeSetupOpen(false);
-          navigate('/kanban');
-        }}
-      />
+      <div style={{ padding: '4px 16px', borderTop: '1px solid var(--border-color, #f0f0f0)' }}>
+        <Button
+          type="text"
+          icon={<SwapOutlined />}
+          block
+          size="small"
+          onClick={logout}
+        >
+          로그아웃
+        </Button>
+      </div>
     </div>
   );
 };

@@ -18,6 +18,7 @@ import KanbanColumn from './KanbanColumn';
 import KanbanCard from './KanbanCard';
 import CardDetail from '../card/CardDetail';
 import CardForm from '../card/CardForm';
+import SelfEvalModal from '../review/SelfEvalModal';
 import { useKanbanStore } from '../../stores/kanbanStore';
 import { useAppStore } from '../../stores/appStore';
 import { KANBAN_COLUMNS, type KanbanColumn as KanbanColumnType, type Topic } from '../../types';
@@ -25,7 +26,7 @@ import { KANBAN_COLUMNS, type KanbanColumn as KanbanColumnType, type Topic } fro
 const KanbanBoard: React.FC = () => {
   const selectedSubjectId = useAppStore((s) => s.selectedSubjectId);
   const subjects = useAppStore((s) => s.subjects);
-  const { topics, loading, loadTopics, moveTopic, completeTopic } = useKanbanStore();
+  const { topics, loading, loadTopics, moveTopic, completeTopic, selfEval, closeSelfEval, submitSelfEval } = useKanbanStore();
 
   const [activeCard, setActiveCard] = useState<Topic | null>(null);
   const [detailTopicId, setDetailTopicId] = useState<string | null>(null);
@@ -258,6 +259,14 @@ const KanbanBoard: React.FC = () => {
         onClose={handleFormClose}
         subjectId={selectedSubjectId}
         editTopicId={editTopicId}
+      />
+
+      {/* Self Evaluation Modal */}
+      <SelfEvalModal
+        open={selfEval.open}
+        topicTitle={selfEval.topicTitle}
+        onSubmit={submitSelfEval}
+        onCancel={closeSelfEval}
       />
     </div>
   );

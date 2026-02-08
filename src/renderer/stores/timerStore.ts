@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { apiService } from '../api/apiService';
 import type { TimerType } from '../../shared/types';
 import {
   DEFAULT_POMODORO_FOCUS,
@@ -209,7 +210,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 
   saveSession: async () => {
     const state = get();
-    if (!window.electronAPI || !state.activeTopicId || !state.startedAt) return;
+    if (!state.activeTopicId || !state.startedAt) return;
 
     const endedAt = new Date().toISOString();
     const duration = state.timerType === 'stopwatch'
@@ -219,7 +220,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
     if (duration <= 0) return;
 
     try {
-      await window.electronAPI.createStudySession({
+      await apiService.createStudySession({
         topicId: state.activeTopicId,
         startedAt: state.startedAt,
         endedAt,

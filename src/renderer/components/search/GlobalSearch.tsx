@@ -3,6 +3,7 @@ import { Modal, Input, List, Tag, Empty, Typography, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { COLUMN_LABELS, COLUMN_COLORS, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../utils/constants';
 import { useAppStore } from '../../stores/appStore';
+import { apiService } from '../../api/apiService';
 import type { Topic } from '../../types';
 
 const { Text } = Typography;
@@ -89,13 +90,13 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose, onSelectTopi
   }, [selectedIndex, flatResults.length]);
 
   const performSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim() || !window.electronAPI) {
+    if (!searchQuery.trim()) {
       setResults([]);
       return;
     }
     setLoading(true);
     try {
-      const searchResults = await window.electronAPI.search(searchQuery);
+      const searchResults = await apiService.search(searchQuery);
       setResults(searchResults as Topic[]);
       setSelectedIndex(0);
     } catch {
