@@ -14,8 +14,8 @@ export async function initDatabase(): Promise<Pool> {
     password: config.postgres.password,
   });
 
-  await createSchema(pool);
   await runMigrations(pool);
+  await createSchema(pool);
 
   return pool;
 }
