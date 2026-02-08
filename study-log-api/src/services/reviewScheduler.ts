@@ -53,8 +53,8 @@ async function checkAndResetStreak(): Promise<void> {
   for (const stats of rows) {
     const lastDate = stats.last_study_date as string | null;
     if (lastDate && lastDate < yesterday) {
-      await pool.query('UPDATE user_stats SET current_streak = 0 WHERE profile_id = $1', [stats.profile_id]);
-      console.log(`[ReviewScheduler] Streak reset for profile ${stats.profile_id} - last study date was ${lastDate}`);
+      await pool.query('UPDATE user_stats SET current_streak = 0 WHERE user_id = $1', [stats.user_id]);
+      console.log(`[ReviewScheduler] Streak reset for profile ${stats.user_id} - last study date was ${lastDate}`);
     }
   }
 }

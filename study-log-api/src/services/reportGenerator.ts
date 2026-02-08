@@ -30,7 +30,7 @@ function getPrevMonth(month: string): string {
   return `${y}-${m}`;
 }
 
-async function getMonthStats(profileId: string, month: string) {
+async function getMonthStats(userId: string, month: string) {
   const pool = getPool();
   const startDate = `${month}-01`;
   const [year, mon] = month.split('-').map(Number);
@@ -38,16 +38,16 @@ async function getMonthStats(profileId: string, month: string) {
 
   const [studyResult, reviewResult, understandingResult] = await Promise.all([
     pool.query(
-      'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE profile_id = $1 AND started_at >= $2 AND started_at < $3',
-      [profileId, startDate, endDate]
+      'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE user_id = $1 AND started_at >= $2 AND started_at < $3',
+      [userId, startDate, endDate]
     ),
     pool.query(
-      'SELECT COUNT(*) AS cnt FROM review_entries WHERE profile_id = $1 AND reviewed_at >= $2 AND reviewed_at < $3',
-      [profileId, startDate, endDate]
+      'SELECT COUNT(*) AS cnt FROM review_entries WHERE user_id = $1 AND reviewed_at >= $2 AND reviewed_at < $3',
+      [userId, startDate, endDate]
     ),
     pool.query(
-      'SELECT COALESCE(AVG(understanding_score), 0) AS avg_score FROM review_entries WHERE profile_id = $1 AND reviewed_at >= $2 AND reviewed_at < $3 AND understanding_score IS NOT NULL',
-      [profileId, startDate, endDate]
+      'SELECT COALESCE(AVG(understanding_score), 0) AS avg_score FROM review_entries WHERE user_id = $1 AND reviewed_at >= $2 AND reviewed_at < $3 AND understanding_score IS NOT NULL',
+      [userId, startDate, endDate]
     ),
   ]);
 
@@ -58,15 +58,15 @@ async function getMonthStats(profileId: string, month: string) {
   };
 }
 
-export async function generateMonthlyReport(profileId: string, month: string): Promise<MonthlyReportData> {
+export async function generateMonthlyReport(userId: string, month: string): Promise<MonthlyReportData> {
   const pool = getPool();
   const startDate = `${month}-01`;
   const [year, mon] = month.split('-').map(Number);
   const endDate = new Date(year, mon, 1).toISOString().split('T')[0];
 
-  const currentStats = await getMonthStats(profileId, month);
+  const currentStats = await getMonthStats(userId, month);
   const prevMonth = getPrevMonth(month);
-  const prevStats = await getMonthStats(profileId, prevMonth);
+  const prevStats = await getMonthStats(userId, prevMonth);
 
   const { rows: masteryRows } = await pool.query(`
     SELECT s.id AS subject_id, s.name AS subject_name,
@@ -77,14 +77,14 @@ export async function generateMonthlyReport(profileId: string, month: string): P
         ELSE 0 END AS ratio
     FROM subjects s
     LEFT JOIN topics t ON t.subject_id = s.id
-    WHERE s.profile_id = $1
+    WHERE s.user_id = $1
     GROUP BY s.id, s.name, s.sort_order
     ORDER BY s.sort_order
-  `, [profileId]);
+  `, [userId]);
 
   const { rows: goalRows } = await pool.query(
-    'SELECT COALESCE(achievement_rate, 0) AS rate FROM weekly_goals WHERE profile_id = $1 AND week_start >= $2 AND week_start < $3 ORDER BY week_start',
-    [profileId, startDate, endDate]
+    'SELECT COALESCE(achievement_rate, 0) AS rate FROM weekly_goals WHERE user_id = $1 AND week_start >= $2 AND week_start < $3 ORDER BY week_start',
+    [userId, startDate, endDate]
   );
 
   const reportData: MonthlyReportData = {
@@ -108,12 +108,12 @@ export async function generateMonthlyReport(profileId: string, month: string): P
 
   const id = uuidv4();
   await pool.query(`
-    INSERT INTO monthly_reports (id, profile_id, month, report_data)
+    INSERT INTO monthly_reports (id, user_id, month, report_data)
     VALUES ($1, $2, $3, $4)
-    ON CONFLICT (profile_id, month)
+    ON CONFLICT (user_id, month)
     DO UPDATE SET report_data = $4, generated_at = NOW()
     RETURNING *
-  `, [id, profileId, month, JSON.stringify(reportData)]);
+  `, [id, userId, month, JSON.stringify(reportData)]);
 
   return reportData;
 }

@@ -6,7 +6,7 @@ export interface AchievementDefinition {
   title: string;
   description: string;
   icon: string;
-  check: (profileId: string) => Promise<{ unlocked: boolean; progress: number; target: number }>;
+  check: (userId: string) => Promise<{ unlocked: boolean; progress: number; target: number }>;
 }
 
 export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
@@ -15,9 +15,9 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '첫 복습',
     description: '첫 번째 복습을 완료했습니다',
     icon: 'star',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
-      const { rows } = await pool.query('SELECT COUNT(*) AS cnt FROM review_entries WHERE profile_id = $1', [profileId]);
+      const { rows } = await pool.query('SELECT COUNT(*) AS cnt FROM review_entries WHERE user_id = $1', [userId]);
       const count = Number(rows[0].cnt);
       return { unlocked: count >= 1, progress: Math.min(count, 1), target: 1 };
     },
@@ -27,9 +27,9 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '3일 연속',
     description: '3일 연속으로 공부했습니다',
     icon: 'fire',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
-      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE profile_id = $1', [profileId]);
+      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE user_id = $1', [userId]);
       const streak = rows.length > 0 ? (rows[0].longest_streak as number) : 0;
       return { unlocked: streak >= 3, progress: Math.min(streak, 3), target: 3 };
     },
@@ -39,9 +39,9 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '1주일 연속',
     description: '7일 연속으로 공부했습니다',
     icon: 'fire',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
-      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE profile_id = $1', [profileId]);
+      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE user_id = $1', [userId]);
       const streak = rows.length > 0 ? (rows[0].longest_streak as number) : 0;
       return { unlocked: streak >= 7, progress: Math.min(streak, 7), target: 7 };
     },
@@ -51,9 +51,9 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '2주 연속',
     description: '14일 연속으로 공부했습니다',
     icon: 'fire',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
-      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE profile_id = $1', [profileId]);
+      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE user_id = $1', [userId]);
       const streak = rows.length > 0 ? (rows[0].longest_streak as number) : 0;
       return { unlocked: streak >= 14, progress: Math.min(streak, 14), target: 14 };
     },
@@ -63,9 +63,9 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '30일 연속',
     description: '30일 연속으로 공부했습니다',
     icon: 'fire',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
-      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE profile_id = $1', [profileId]);
+      const { rows } = await pool.query('SELECT longest_streak FROM user_stats WHERE user_id = $1', [userId]);
       const streak = rows.length > 0 ? (rows[0].longest_streak as number) : 0;
       return { unlocked: streak >= 30, progress: Math.min(streak, 30), target: 30 };
     },
@@ -75,11 +75,11 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '목표 달성왕',
     description: '주간 목표를 100% 달성했습니다',
     icon: 'trophy',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
       const { rows } = await pool.query(
-        'SELECT COUNT(*) AS cnt FROM weekly_goals WHERE profile_id = $1 AND achievement_rate >= 1.0',
-        [profileId]
+        'SELECT COUNT(*) AS cnt FROM weekly_goals WHERE user_id = $1 AND achievement_rate >= 1.0',
+        [userId]
       );
       const count = Number(rows[0].cnt);
       return { unlocked: count >= 1, progress: Math.min(count, 1), target: 1 };
@@ -90,11 +90,11 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '공부 10시간',
     description: '총 10시간 공부했습니다',
     icon: 'clock',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
       const { rows } = await pool.query(
-        'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE profile_id = $1',
-        [profileId]
+        'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE user_id = $1',
+        [userId]
       );
       const totalSeconds = Number(rows[0].total);
       const hours = totalSeconds / 3600;
@@ -106,11 +106,11 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '공부 50시간',
     description: '총 50시간 공부했습니다',
     icon: 'clock',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
       const { rows } = await pool.query(
-        'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE profile_id = $1',
-        [profileId]
+        'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE user_id = $1',
+        [userId]
       );
       const totalSeconds = Number(rows[0].total);
       const hours = totalSeconds / 3600;
@@ -122,11 +122,11 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '공부 100시간',
     description: '총 100시간 공부했습니다',
     icon: 'clock',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
       const { rows } = await pool.query(
-        'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE profile_id = $1',
-        [profileId]
+        'SELECT COALESCE(SUM(duration), 0) AS total FROM study_sessions WHERE user_id = $1',
+        [userId]
       );
       const totalSeconds = Number(rows[0].total);
       const hours = totalSeconds / 3600;
@@ -138,11 +138,11 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '완벽한 이해',
     description: '이해도 5점 복습을 10번 달성했습니다',
     icon: 'brain',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
       const { rows } = await pool.query(
-        'SELECT COUNT(*) AS cnt FROM review_entries WHERE profile_id = $1 AND understanding_score = 5',
-        [profileId]
+        'SELECT COUNT(*) AS cnt FROM review_entries WHERE user_id = $1 AND understanding_score = 5',
+        [userId]
       );
       const count = Number(rows[0].cnt);
       return { unlocked: count >= 10, progress: Math.min(count, 10), target: 10 };
@@ -153,11 +153,11 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     title: '성찰의 달인',
     description: '주간 성찰을 3번 작성했습니다',
     icon: 'pencil',
-    check: async (profileId) => {
+    check: async (userId) => {
       const pool = getPool();
       const { rows } = await pool.query(
-        'SELECT COUNT(*) AS cnt FROM weekly_reflections WHERE profile_id = $1',
-        [profileId]
+        'SELECT COUNT(*) AS cnt FROM weekly_reflections WHERE user_id = $1',
+        [userId]
       );
       const count = Number(rows[0].cnt);
       return { unlocked: count >= 3, progress: Math.min(count, 3), target: 3 };
@@ -165,25 +165,25 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   },
 ];
 
-export async function checkAndAward(profileId: string): Promise<string[]> {
+export async function checkAndAward(userId: string): Promise<string[]> {
   const pool = getPool();
   const newlyUnlocked: string[] = [];
 
   const { rows: existing } = await pool.query(
-    'SELECT achievement_key FROM achievements WHERE profile_id = $1',
-    [profileId]
+    'SELECT achievement_key FROM achievements WHERE user_id = $1',
+    [userId]
   );
   const alreadyUnlocked = new Set(existing.map((r) => r.achievement_key as string));
 
   for (const def of ACHIEVEMENT_DEFINITIONS) {
     if (alreadyUnlocked.has(def.key)) continue;
 
-    const result = await def.check(profileId);
+    const result = await def.check(userId);
     if (result.unlocked) {
       const id = uuidv4();
       await pool.query(
-        'INSERT INTO achievements (id, profile_id, achievement_key) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
-        [id, profileId, def.key]
+        'INSERT INTO achievements (id, user_id, achievement_key) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
+        [id, userId, def.key]
       );
       newlyUnlocked.push(def.key);
     }
