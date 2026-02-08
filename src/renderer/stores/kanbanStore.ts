@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { apiService } from '../api/apiService';
-import type { Topic, KanbanColumn } from '../../shared/types';
+import type { Topic, KanbanColumn, DailyProgress } from '../../shared/types';
 
 interface SelfEvalState {
   open: boolean;
@@ -11,6 +11,8 @@ interface SelfEvalState {
 
 interface KanbanState {
   topics: Topic[];
+  completedToday: Topic[];
+  dailyProgress: DailyProgress | null;
   loading: boolean;
   error: string | null;
   lastSubjectFilter: string | null;
@@ -18,11 +20,13 @@ interface KanbanState {
   selfEval: SelfEvalState;
   openSelfEval: (topicId: string, topicTitle: string, fromColumn: KanbanColumn) => void;
   closeSelfEval: () => void;
-  submitSelfEval: (data: { understandingScore: number; selfNote: string; moveBack: boolean }) => Promise<void>;
+  submitSelfEval: (data: { understandingScore: number; selfNote: string }) => Promise<void>;
 
   loadTopics: (subjectId?: string | null) => Promise<void>;
+  loadCompletedToday: () => Promise<void>;
+  loadDailyProgress: () => Promise<void>;
   moveTopic: (topicId: string, toColumn: KanbanColumn, sortOrder: number) => Promise<void>;
-  completeTopic: (topicId: string, fromColumn: KanbanColumn) => Promise<void>;
+  completeTopic: (topicId: string, fromColumn: KanbanColumn) => void;
   createTopic: (data: Partial<Topic>) => Promise<Topic | null>;
   updateTopic: (id: string, data: Partial<Topic>) => Promise<void>;
   deleteTopic: (id: string) => Promise<void>;
@@ -39,6 +43,8 @@ const INITIAL_SELF_EVAL: SelfEvalState = {
 
 export const useKanbanStore = create<KanbanState>((set, get) => ({
   topics: [],
+  completedToday: [],
+  dailyProgress: null,
   loading: false,
   error: null,
   lastSubjectFilter: null,
@@ -53,24 +59,20 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     set({ selfEval: { ...INITIAL_SELF_EVAL } });
   },
 
-  submitSelfEval: async ({ understandingScore, selfNote, moveBack }) => {
+  submitSelfEval: async ({ understandingScore, selfNote }) => {
     const { selfEval, lastSubjectFilter } = get();
     if (!selfEval.topicId) return;
 
     try {
-      const reviewData: { topicId: string; fromColumn: string; toColumn?: string; understandingScore?: number; selfNote?: string } = {
+      await apiService.createReview({
         topicId: selfEval.topicId,
         fromColumn: selfEval.fromColumn,
         understandingScore,
         selfNote,
-      };
-
-      if (moveBack) {
-        reviewData.toColumn = 'today';
-      }
-
-      await apiService.createReview(reviewData);
+      });
       await get().loadTopics(lastSubjectFilter);
+      await get().loadCompletedToday();
+      await get().loadDailyProgress();
     } catch (err) {
       console.error('Failed to submit self evaluation:', err);
     } finally {
@@ -140,6 +142,24 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       set((s) => ({ topics: s.topics.filter((t) => t.id !== id) }));
     } catch (err) {
       console.error('Failed to delete topic:', err);
+    }
+  },
+
+  loadCompletedToday: async () => {
+    try {
+      const completed = await apiService.getCompletedToday();
+      set({ completedToday: completed as Topic[] });
+    } catch (err) {
+      console.error('Failed to load completed today:', err);
+    }
+  },
+
+  loadDailyProgress: async () => {
+    try {
+      const progress = await apiService.getDailyProgress();
+      set({ dailyProgress: progress });
+    } catch (err) {
+      console.error('Failed to load daily progress:', err);
     }
   },
 

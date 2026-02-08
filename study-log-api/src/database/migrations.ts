@@ -439,6 +439,54 @@ const migrations: Migration[] = [
       }
     },
   },
+  {
+    version: 8,
+    description: 'Redesign kanban columns for spaced repetition with mastery tracking',
+    up: async (client) => {
+      // 1) Add mastery_count column
+      const masteryCol = await client.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'topics' AND column_name = 'mastery_count'"
+      );
+      if (masteryCol.rows.length === 0) {
+        await client.query('ALTER TABLE topics ADD COLUMN mastery_count INTEGER NOT NULL DEFAULT 0');
+      }
+
+      // 2) Migrate data FIRST (before CHECK change)
+      await client.query(`
+        UPDATE topics SET column_name = 'reviewing',
+          next_review_at = COALESCE(next_review_at, NOW() + INTERVAL '3 days')
+          WHERE column_name = 'three_days'
+      `);
+      await client.query(`
+        UPDATE topics SET column_name = 'reviewing',
+          next_review_at = COALESCE(next_review_at, NOW() + INTERVAL '7 days')
+          WHERE column_name = 'one_week'
+      `);
+      await client.query(`
+        UPDATE topics SET column_name = 'reviewing',
+          next_review_at = COALESCE(next_review_at, NOW() + INTERVAL '30 days')
+          WHERE column_name = 'one_month'
+      `);
+      await client.query(`
+        UPDATE topics SET column_name = 'mastered', mastery_count = 3
+          WHERE column_name = 'done'
+      `);
+
+      // 3) Drop old CHECK and add new one
+      await client.query('ALTER TABLE topics DROP CONSTRAINT IF EXISTS topics_column_name_check');
+      await client.query(`
+        ALTER TABLE topics ADD CONSTRAINT topics_column_name_check
+          CHECK (column_name IN ('backlog', 'today', 'reviewing', 'mastered'))
+      `);
+
+      // 4) Index for reviewing queries
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_topics_column_reviewing
+          ON topics(column_name, next_review_at)
+          WHERE column_name = 'reviewing'
+      `);
+    },
+  },
 ];
 
 export async function runMigrations(pool: Pool): Promise<void> {

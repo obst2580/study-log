@@ -2,16 +2,15 @@
 
 export type Difficulty = 'high' | 'medium' | 'low';
 export type Importance = 'high' | 'medium' | 'low';
-export type KanbanColumn = 'today' | 'three_days' | 'one_week' | 'one_month' | 'done';
+export type KanbanColumn = 'backlog' | 'today' | 'reviewing' | 'mastered';
 export type TimerType = 'pomodoro' | 'stopwatch';
 export type UserRole = 'student' | 'parent';
 
-export const KANBAN_COLUMNS: { key: KanbanColumn; label: string; days: number | null }[] = [
-  { key: 'today', label: '오늘할것', days: null },
-  { key: 'three_days', label: '3일후', days: 3 },
-  { key: 'one_week', label: '1주후', days: 7 },
-  { key: 'one_month', label: '1달후', days: 30 },
-  { key: 'done', label: '완료', days: null },
+export const KANBAN_COLUMNS: { key: KanbanColumn; label: string }[] = [
+  { key: 'backlog', label: '백로그' },
+  { key: 'today', label: '오늘 학습' },
+  { key: 'reviewing', label: '복습 대기' },
+  { key: 'mastered', label: '마스터' },
 ];
 
 export type GradeLevel = 'middle-1' | 'middle-2' | 'middle-3' | 'high-1' | 'high-2' | 'high-2-science' | 'high-3' | 'high-3-science';
@@ -60,6 +59,7 @@ export interface Topic {
   studyTimeTotal: number;
   nextReviewAt: string | null;
   sortOrder: number;
+  masteryCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -375,4 +375,36 @@ export interface CurriculumTopic {
   importance: Importance;
   sortOrder: number;
   checklistItems: { id: string; text: string; sortOrder: number }[];
+}
+
+// -- Daily Progress --
+
+export interface DailyProgress {
+  completedToday: number;
+  totalToday: number;
+  reviewingCount: number;
+  dailyLimit: number;
+}
+
+export interface CurriculumProgress {
+  backlogCount: number;
+  activeCount: number;
+  masteredCount: number;
+  totalCount: number;
+  progressPercent: number;
+}
+
+export interface UnitWithProgress extends Unit {
+  backlogCount: number;
+  reviewingCount: number;
+  masteredCount: number;
+  totalCount: number;
+  topics: Topic[];
+}
+
+export interface SubjectWithProgress extends Subject {
+  backlogCount: number;
+  reviewingCount: number;
+  masteredCount: number;
+  units: UnitWithProgress[];
 }

@@ -22,6 +22,58 @@ router.get('/', asyncHandler(async (req, res) => {
   res.json(mapUserStats(rows[0]));
 }));
 
+// GET /api/stats/daily-progress - Get daily progress
+router.get('/daily-progress', asyncHandler(async (req, res) => {
+  const pool = getPool();
+  const [todayResult, completedResult, reviewingResult] = await Promise.all([
+    pool.query(`
+      SELECT COUNT(*) as count FROM topics t
+      JOIN subjects s ON s.id = t.subject_id
+      WHERE s.user_id = $1 AND t.column_name = 'today'
+    `, [req.userId]),
+    pool.query(`
+      SELECT COUNT(*) as count FROM review_entries
+      WHERE user_id = $1 AND DATE(reviewed_at) = CURRENT_DATE
+    `, [req.userId]),
+    pool.query(`
+      SELECT COUNT(*) as count FROM topics t
+      JOIN subjects s ON s.id = t.subject_id
+      WHERE s.user_id = $1 AND t.column_name = 'reviewing'
+    `, [req.userId]),
+  ]);
+  res.json({
+    completedToday: Number(completedResult.rows[0].count),
+    totalToday: Number(todayResult.rows[0].count),
+    reviewingCount: Number(reviewingResult.rows[0].count),
+    dailyLimit: 10,
+  });
+}));
+
+// GET /api/stats/curriculum-progress - Get curriculum progress
+router.get('/curriculum-progress', asyncHandler(async (req, res) => {
+  const pool = getPool();
+  const { rows } = await pool.query(`
+    SELECT
+      SUM(CASE WHEN t.column_name = 'backlog' THEN 1 ELSE 0 END) as backlog_count,
+      SUM(CASE WHEN t.column_name IN ('today', 'reviewing') THEN 1 ELSE 0 END) as active_count,
+      SUM(CASE WHEN t.column_name = 'mastered' THEN 1 ELSE 0 END) as mastered_count,
+      COUNT(*) as total_count
+    FROM topics t
+    JOIN subjects s ON s.id = t.subject_id
+    WHERE s.user_id = $1
+  `, [req.userId]);
+  const row = rows[0];
+  const total = Number(row.total_count);
+  const mastered = Number(row.mastered_count);
+  res.json({
+    backlogCount: Number(row.backlog_count),
+    activeCount: Number(row.active_count),
+    masteredCount: mastered,
+    totalCount: total,
+    progressPercent: total > 0 ? Math.round((mastered / total) * 100) : 0,
+  });
+}));
+
 // GET /api/stats/mastery - Get subject mastery ratios
 router.get('/mastery', asyncHandler(async (_req, res) => {
   const pool = getPool();
@@ -30,9 +82,9 @@ router.get('/mastery', asyncHandler(async (_req, res) => {
       s.id AS subject_id,
       s.name AS subject_name,
       COUNT(t.id) AS total_topics,
-      SUM(CASE WHEN t.column_name = 'done' THEN 1 ELSE 0 END) AS completed_topics,
+      SUM(CASE WHEN t.column_name = 'mastered' THEN 1 ELSE 0 END) AS completed_topics,
       CASE WHEN COUNT(t.id) > 0
-        THEN ROUND(CAST(SUM(CASE WHEN t.column_name = 'done' THEN 1 ELSE 0 END) AS NUMERIC) / COUNT(t.id), 2)
+        THEN ROUND(CAST(SUM(CASE WHEN t.column_name = 'mastered' THEN 1 ELSE 0 END) AS NUMERIC) / COUNT(t.id), 2)
         ELSE 0
       END AS ratio
     FROM subjects s

@@ -52,7 +52,7 @@ const Dashboard: React.FC = () => {
   }, [user?.id]);
 
   const todayTopics = topics.filter((t) => t.column === 'today').length;
-  const doneTopics = topics.filter((t) => t.column === 'done').length;
+  const doneTopics = topics.filter((t) => t.column === 'mastered').length;
   const totalTopics = topics.length;
 
   return (

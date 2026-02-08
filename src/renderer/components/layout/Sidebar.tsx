@@ -59,6 +59,7 @@ const Sidebar: React.FC = () => {
 
   const viewItems = [
     { key: '/kanban', icon: <AppstoreOutlined />, label: '칸반 보드' },
+    { key: '/curriculum', icon: <BookOutlined />, label: '커리큘럼 관리' },
     { key: '/dashboard', icon: <DashboardOutlined />, label: '대시보드' },
     { key: '/calendar', icon: <CalendarOutlined />, label: '달력' },
     { key: '/timeline', icon: <FieldTimeOutlined />, label: '타임라인' },

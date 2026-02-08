@@ -215,7 +215,7 @@ export const GradeSetup: React.FC<GradeSetupProps> = ({ open, onClose, onComplet
               difficulty: topic.difficulty,
               importance: topic.importance,
               tags: [],
-              column: 'today',
+              column: 'backlog',
             });
 
             for (const item of topic.checklist) {

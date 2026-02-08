@@ -133,7 +133,7 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
         )}
       </div>
 
-      {topic.column !== 'done' && (
+      {topic.column !== 'mastered' && (
         <div style={{ marginTop: 6, display: 'flex', justifyContent: 'flex-end' }}>
           <Tooltip title="학습 완료 (다음 단계로 이동)">
             <Button

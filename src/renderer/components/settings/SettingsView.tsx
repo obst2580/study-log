@@ -9,6 +9,7 @@ import {
   BookOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../stores/appStore';
 import { apiService } from '../../api/apiService';
 
@@ -26,6 +27,7 @@ const GRADES = [
 ];
 
 const SettingsView: React.FC = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const settings = useAppStore((s) => s.settings);
   const updateSettings = useAppStore((s) => s.updateSettings);
@@ -126,8 +128,9 @@ const SettingsView: React.FC = () => {
     setApplying(true);
     try {
       await apiService.applyCurriculum(generatedTemplateId);
-      message.success('커리큘럼이 칸반 보드에 적용되었습니다');
+      message.success('커리큘럼이 백로그에 추가되었습니다');
       loadSubjects();
+      navigate('/curriculum');
     } catch {
       message.error('적용 실패');
     } finally {

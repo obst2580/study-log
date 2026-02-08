@@ -1,9 +1,11 @@
-export const COLUMN_PROGRESSION: Record<string, { next: string; days: number } | null> = {
-  today: { next: 'three_days', days: 3 },
-  three_days: { next: 'one_week', days: 7 },
-  one_week: { next: 'one_month', days: 30 },
-  one_month: { next: 'done', days: 0 },
-  done: null,
+export const SCORE_TO_INTERVAL_DAYS: Record<number, number> = {
+  1: 1,
+  2: 2,
+  3: 4,
+  4: 10,
+  5: 30,
 };
 
+export const MASTERY_THRESHOLD = 3;
+export const DEFAULT_DAILY_LIMIT = 10;
 export const MS_PER_DAY = 86400000;

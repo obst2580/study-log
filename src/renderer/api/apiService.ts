@@ -8,6 +8,7 @@ import type {
   WeakTopic, StudyEfficiency,
   MonthlyReport, ChallengeWithParticipants, LearningPatterns,
   CurriculumTemplate, CurriculumTemplateDetail,
+  DailyProgress, CurriculumProgress, SubjectWithProgress,
 } from '../../shared/types';
 
 type QueryParams = Record<string, string | number | boolean | undefined>;
@@ -165,6 +166,14 @@ export const apiService = {
 
   // Patterns
   getLearningPatterns: (userId: string) => api.get<LearningPatterns>(`/analysis/patterns/${userId}`),
+
+  // Daily Progress
+  getDailyProgress: () => api.get<DailyProgress>('/stats/daily-progress'),
+  getCurriculumProgress: () => api.get<CurriculumProgress>('/stats/curriculum-progress'),
+  getCompletedToday: () => api.get<Topic[]>('/reviews/completed-today'),
+  getCurriculumTree: () => api.get<SubjectWithProgress[]>('/topics/curriculum-tree'),
+  assignTopicToToday: (topicId: string) => api.post<Topic>(`/topics/${topicId}/assign-today`),
+  bulkAssignToToday: (topicIds: string[]) => api.post<Topic[]>('/topics/bulk-assign-today', { topicIds }),
 
   // Backup
   exportData: () => api.get<unknown>('/backup/export'),

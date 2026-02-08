@@ -33,19 +33,17 @@ export const IMPORTANCE_COLORS: Record<string, string> = {
 };
 
 export const COLUMN_LABELS: Record<string, string> = {
-  today: '오늘할것',
-  three_days: '3일후',
-  one_week: '1주후',
-  one_month: '1달후',
-  done: '완료',
+  backlog: '백로그',
+  today: '오늘 학습',
+  reviewing: '복습 대기',
+  mastered: '마스터',
 };
 
 export const COLUMN_COLORS: Record<string, string> = {
+  backlog: '#d9d9d9',
   today: '#1890ff',
-  three_days: '#722ed1',
-  one_week: '#13c2c2',
-  one_month: '#fa8c16',
-  done: '#52c41a',
+  reviewing: '#722ed1',
+  mastered: '#52c41a',
 };
 
 export const SUBJECT_PRESET_COLORS = [

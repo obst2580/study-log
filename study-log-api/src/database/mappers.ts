@@ -54,6 +54,7 @@ export function mapTopic(row: DbRow) {
     studyTimeTotal: row.study_time_total as number,
     nextReviewAt: (row.next_review_at as string) || null,
     sortOrder: row.sort_order as number,
+    masteryCount: row.mastery_count as number,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };

@@ -55,7 +55,7 @@ router.get('/study-efficiency/:profileId', asyncHandler(async (req, res) => {
       SELECT COUNT(*) AS cnt
       FROM topics t
       JOIN subjects s ON s.id = t.subject_id
-      WHERE s.user_id = $1 AND t.column_name = 'done'
+      WHERE s.user_id = $1 AND t.column_name = 'mastered'
     `, [profileId]),
     pool.query(`
       SELECT COALESCE(AVG(understanding_score), 0) AS avg_score

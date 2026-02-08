@@ -1,39 +1,5 @@
 import type { KanbanColumn } from '../../shared/types';
 
-// ── Spaced Repetition Logic ──
-
-/**
- * Column progression map defining the flow:
- * today -> three_days (3 days) -> one_week (7 days) -> one_month (30 days) -> done
- */
-const COLUMN_FLOW: Record<KanbanColumn, { next: KanbanColumn; days: number } | null> = {
-  today: { next: 'three_days', days: 3 },
-  three_days: { next: 'one_week', days: 7 },
-  one_week: { next: 'one_month', days: 30 },
-  one_month: { next: 'done', days: 0 },
-  done: null,
-};
-
-/**
- * Get the next column and review date when a card is marked as reviewed/complete.
- */
-export function getNextReviewInfo(currentColumn: KanbanColumn): {
-  nextColumn: KanbanColumn;
-  nextReviewAt: Date | null;
-} | null {
-  const progression = COLUMN_FLOW[currentColumn];
-  if (!progression) return null;
-
-  const nextReviewAt = progression.days > 0
-    ? new Date(Date.now() + progression.days * 24 * 60 * 60 * 1000)
-    : null;
-
-  return {
-    nextColumn: progression.next,
-    nextReviewAt,
-  };
-}
-
 /**
  * Check if a card's review is overdue.
  */
@@ -63,16 +29,19 @@ export function formatReviewDate(nextReviewAt: string | null): string {
 }
 
 /**
- * Calculate mastery percentage based on column position.
- * today=0%, three_days=25%, one_week=50%, one_month=75%, done=100%
+ * Calculate mastery percentage based on column position and mastery count.
  */
-export function getMasteryPercent(column: KanbanColumn): number {
-  const map: Record<KanbanColumn, number> = {
-    today: 0,
-    three_days: 25,
-    one_week: 50,
-    one_month: 75,
-    done: 100,
-  };
-  return map[column] ?? 0;
+export function getMasteryPercent(column: KanbanColumn, masteryCount: number = 0): number {
+  if (column === 'mastered') return 100;
+  if (column === 'backlog') return 0;
+  if (column === 'reviewing') return 25 + (masteryCount * 25); // 0~2 -> 25~75%
+  return 10; // today (first study)
 }
+
+export const SCORE_TO_INTERVAL_DAYS: Record<number, number> = {
+  1: 1,
+  2: 2,
+  3: 4,
+  4: 10,
+  5: 30,
+};

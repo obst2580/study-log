@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { v4 as uuidv4 } from 'uuid';
 import { getPool } from '../database/index.js';
-import { MS_PER_DAY } from '../utils/constants.js';
+import { MS_PER_DAY, DEFAULT_DAILY_LIMIT } from '../utils/constants.js';
 
 async function moveOverdueCards(): Promise<number> {
   const pool = getPool();
@@ -11,17 +11,24 @@ async function moveOverdueCards(): Promise<number> {
     SELECT id, column_name FROM topics
     WHERE next_review_at IS NOT NULL
       AND next_review_at <= $1
-      AND column_name != 'today'
-      AND column_name != 'done'
+      AND column_name = 'reviewing'
   `, [now]);
 
   if (overdueTopics.length === 0) return 0;
+
+  // Apply daily limit
+  const { rows: [{ count: todayCount }] } = await pool.query(
+    "SELECT COUNT(*) as count FROM topics WHERE column_name = 'today'"
+  );
+  const remaining = DEFAULT_DAILY_LIMIT - Number(todayCount);
+  const topicsToMove = overdueTopics.slice(0, Math.max(0, remaining));
+  if (topicsToMove.length === 0) return 0;
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    for (const topic of overdueTopics) {
+    for (const topic of topicsToMove) {
       await client.query(
         "UPDATE topics SET column_name = 'today', next_review_at = NULL, updated_at = NOW() WHERE id = $1",
         [topic.id]
@@ -42,7 +49,7 @@ async function moveOverdueCards(): Promise<number> {
     client.release();
   }
 
-  return overdueTopics.length;
+  return topicsToMove.length;
 }
 
 async function checkAndResetStreak(): Promise<void> {

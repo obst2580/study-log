@@ -10,17 +10,33 @@ const SUBJECT_COLORS = [
 export async function getOrGenerateTemplate(grade: string): Promise<{ id: string; status: string }> {
   const pool = getPool();
 
-  // Check for existing active template
+  // Check for existing template
   const { rows: existing } = await pool.query(
-    "SELECT id, status FROM curriculum_templates WHERE grade = $1 AND status IN ('active', 'generating')",
+    'SELECT id, status FROM curriculum_templates WHERE grade = $1',
     [grade]
   );
 
   if (existing.length > 0) {
-    return { id: existing[0].id as string, status: existing[0].status as string };
+    const { id, status } = existing[0] as { id: string; status: string };
+    if (status === 'active' || status === 'generating') {
+      return { id, status };
+    }
+    // Archived (previously failed) - reset and retry
+    await pool.query(
+      "UPDATE curriculum_templates SET status = 'generating', updated_at = NOW() WHERE id = $1",
+      [id]
+    );
+    generateAndSaveTemplate(id, grade).catch((err) => {
+      console.error('Curriculum generation failed:', err);
+      getPool().query(
+        "UPDATE curriculum_templates SET status = 'archived', updated_at = NOW() WHERE id = $1",
+        [id]
+      ).catch(console.error);
+    });
+    return { id, status: 'generating' };
   }
 
-  // Create template in generating state
+  // Create new template in generating state
   const templateId = uuidv4();
   await pool.query(
     "INSERT INTO curriculum_templates (id, grade, status) VALUES ($1, $2, 'generating')",
@@ -139,7 +155,7 @@ export async function copyTemplateToUser(templateId: string, userId: string): Pr
           const topicId = uuidv4();
           await client.query(
             `INSERT INTO topics (id, subject_id, unit_id, title, difficulty, importance, sort_order, template_topic_id, column_name)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'today')`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'backlog')`,
             [topicId, subjectId, unitId, ctTopic.title, ctTopic.difficulty, ctTopic.importance, ctTopic.sort_order, ctTopic.id]
           );
 

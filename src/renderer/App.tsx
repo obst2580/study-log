@@ -14,6 +14,7 @@ import AchievementList from './components/achievements/AchievementList';
 import MonthlyReportView from './components/report/MonthlyReport';
 import ChallengeListView from './components/challenge/ChallengeList';
 import LearningPatternsView from './components/analysis/LearningPatterns';
+import CurriculumBrowser from './components/curriculum/CurriculumBrowser';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { useAppStore } from './stores/appStore';
@@ -46,6 +47,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<KanbanBoard />} />
         <Route path="/kanban" element={<KanbanBoard />} />
+        <Route path="/curriculum" element={<CurriculumBrowser />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/calendar" element={<CalendarView />} />
         <Route path="/timeline" element={<TimelineView />} />

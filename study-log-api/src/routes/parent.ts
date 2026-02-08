@@ -43,9 +43,9 @@ router.get('/summary/:userId', asyncHandler(async (req, res) => {
     pool.query(`
       SELECT s.id AS subject_id, s.name AS subject_name,
         COUNT(t.id) AS total_topics,
-        SUM(CASE WHEN t.column_name = 'done' THEN 1 ELSE 0 END) AS completed_topics,
+        SUM(CASE WHEN t.column_name = 'mastered' THEN 1 ELSE 0 END) AS completed_topics,
         CASE WHEN COUNT(t.id) > 0
-          THEN ROUND(CAST(SUM(CASE WHEN t.column_name = 'done' THEN 1 ELSE 0 END) AS NUMERIC) / COUNT(t.id), 2)
+          THEN ROUND(CAST(SUM(CASE WHEN t.column_name = 'mastered' THEN 1 ELSE 0 END) AS NUMERIC) / COUNT(t.id), 2)
           ELSE 0 END AS ratio
       FROM subjects s
       LEFT JOIN topics t ON t.subject_id = s.id
