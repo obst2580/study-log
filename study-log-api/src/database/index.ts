@@ -12,10 +12,11 @@ export async function initDatabase(): Promise<Pool> {
     database: config.postgres.database,
     user: config.postgres.user,
     password: config.postgres.password,
+    ssl: config.postgres.ssl ? { rejectUnauthorized: false } : false,
   });
 
-  await runMigrations(pool);
   await createSchema(pool);
+  await runMigrations(pool);
 
   return pool;
 }

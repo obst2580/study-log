@@ -501,6 +501,24 @@ export async function runMigrations(pool: Pool): Promise<void> {
   const { rows: appliedRows } = await pool.query('SELECT version FROM schema_migrations');
   const appliedVersions = new Set(appliedRows.map((r) => r.version));
 
+  // Fresh database: createSchema already created the latest schema,
+  // so mark all migrations as applied without running them.
+  if (appliedVersions.size === 0) {
+    const { rows: tableCheck } = await pool.query(
+      "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename = 'topics'"
+    );
+    if (tableCheck.length > 0) {
+      for (const migration of migrations) {
+        await pool.query(
+          'INSERT INTO schema_migrations (version, description) VALUES ($1, $2)',
+          [migration.version, migration.description]
+        );
+      }
+      console.log(`Fresh database detected: marked ${migrations.length} migrations as applied`);
+      return;
+    }
+  }
+
   for (const migration of migrations) {
     if (!appliedVersions.has(migration.version)) {
       const client = await pool.connect();
