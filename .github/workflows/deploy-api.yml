@@ -1,0 +1,40 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'study-log-api/**'
+      - '.github/workflows/deploy-api.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: study-log-api/package-lock.json
+
+      - name: Install and build
+        working-directory: study-log-api
+        run: |
+          npm ci
+          npm run build
+
+      - name: Package for deployment
+        working-directory: study-log-api
+        run: |
+          rm -rf node_modules
+          npm ci --omit=dev
+          zip -r ../deploy-api.zip package.json dist/ node_modules/ -x "*.map" "*.d.ts"
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: studylog-api
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: deploy-api.zip
