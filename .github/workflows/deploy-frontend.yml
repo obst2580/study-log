@@ -22,7 +22,7 @@ jobs:
 
       - name: Install and build
         env:
-          VITE_API_URL: https://studylog-api.azurewebsites.net/api
+          VITE_API_URL: https://api.gomgame.net/api
         run: |
           npm ci
           npm run build
