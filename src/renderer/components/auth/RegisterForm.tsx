@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Form, Input, Button, Select, Radio, Typography, message } from 'antd';
+import { App, Card, Form, Input, Button, Select, Radio, Typography } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -20,6 +20,7 @@ const GRADES = [
 const RegisterForm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
   const register = useAuthStore((s) => s.register);
   const navigate = useNavigate();
 

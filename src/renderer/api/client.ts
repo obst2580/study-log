@@ -57,6 +57,7 @@ async function request<T>(
   const res = await fetch(url, { ...options, headers });
 
   if (res.status === 401) {
+    const errorBody = await res.json().catch(() => ({ error: res.statusText }));
     const refreshed = await tryRefreshToken();
     if (refreshed) {
       headers['Authorization'] = `Bearer ${getAccessToken()}`;
@@ -67,7 +68,7 @@ async function request<T>(
       }
       return retryRes.json();
     }
-    throw new Error('Unauthorized');
+    throw new Error(errorBody.error || 'Unauthorized');
   }
 
   if (!res.ok) {

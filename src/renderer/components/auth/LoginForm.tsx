@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Form, Input, Button, Typography, message } from 'antd';
+import { App, Card, Form, Input, Button, Typography } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -9,19 +9,18 @@ const { Title, Text, Link } = Typography;
 const LoginForm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: { email: string; password: string }) => {
+    setLoading(true);
     try {
-      const values = await form.validateFields();
-      setLoading(true);
       await login(values.email, values.password);
       message.success('로그인 성공');
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        message.error(err.message || '로그인 실패');
-      }
+      const msg = err instanceof Error ? err.message : '로그인 실패';
+      message.error(msg);
     } finally {
       setLoading(false);
     }

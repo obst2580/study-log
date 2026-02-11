@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { ConfigProvider, theme as antTheme } from 'antd';
+import { App as AntApp, ConfigProvider, theme as antTheme } from 'antd';
 import koKR from 'antd/locale/ko_KR';
-import App from './App';
+import AppRouter from './App';
 import { useAppStore } from './stores/appStore';
 import './styles/global.css';
 
@@ -21,9 +21,11 @@ function Root() {
         },
       }}
     >
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <AntApp>
+        <BrowserRouter>
+          <AppRouter />
+        </BrowserRouter>
+      </AntApp>
     </ConfigProvider>
   );
 }
