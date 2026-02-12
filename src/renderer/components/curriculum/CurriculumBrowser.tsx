@@ -281,7 +281,7 @@ const CurriculumBrowser: React.FC = () => {
                   }
                   style={{
                     marginBottom: 8,
-                    borderRadius: 8,
+                    borderRadius: 12,
                     overflow: 'hidden',
                     border: '1px solid #f0f0f0',
                   }}
@@ -323,7 +323,7 @@ const CurriculumBrowser: React.FC = () => {
                                 gap: 8,
                                 padding: '4px 8px',
                                 borderRadius: 4,
-                                background: isChecked ? '#e6f7ff' : 'transparent',
+                                background: isChecked ? '#E8D5F5' : 'transparent',
                                 transition: 'background 0.15s',
                               }}
                             >

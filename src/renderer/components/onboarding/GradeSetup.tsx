@@ -62,7 +62,7 @@ const GRADES = [
 ];
 
 const SUBJECT_COLORS = [
-  '#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1',
+  '#7C3AED', '#10B981', '#D97706', '#DC2626', '#A78BFA',
   '#13c2c2', '#eb2f96', '#fa8c16', '#a0d911', '#2f54eb',
 ];
 

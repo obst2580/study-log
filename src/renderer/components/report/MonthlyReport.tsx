@@ -98,7 +98,7 @@ const MonthlyReportView: React.FC = () => {
                 {growth && (
                   <div style={{ fontSize: 12, marginTop: 4 }}>
                     {growth.studyTimeDelta >= 0 ? (
-                      <span style={{ color: '#52c41a' }}><ArrowUpOutlined /> {formatMinutes(growth.studyTimeDelta)}</span>
+                      <span style={{ color: '#10B981' }}><ArrowUpOutlined /> {formatMinutes(growth.studyTimeDelta)}</span>
                     ) : (
                       <span style={{ color: '#ff4d4f' }}><ArrowDownOutlined /> {formatMinutes(Math.abs(growth.studyTimeDelta))}</span>
                     )}
@@ -118,7 +118,7 @@ const MonthlyReportView: React.FC = () => {
                 {growth && (
                   <div style={{ fontSize: 12, marginTop: 4 }}>
                     {growth.reviewCountDelta >= 0 ? (
-                      <span style={{ color: '#52c41a' }}><ArrowUpOutlined /> +{growth.reviewCountDelta}</span>
+                      <span style={{ color: '#10B981' }}><ArrowUpOutlined /> +{growth.reviewCountDelta}</span>
                     ) : (
                       <span style={{ color: '#ff4d4f' }}><ArrowDownOutlined /> {growth.reviewCountDelta}</span>
                     )}
@@ -138,7 +138,7 @@ const MonthlyReportView: React.FC = () => {
                 {growth && (
                   <div style={{ fontSize: 12, marginTop: 4 }}>
                     {growth.understandingDelta >= 0 ? (
-                      <span style={{ color: '#52c41a' }}><ArrowUpOutlined /> +{growth.understandingDelta.toFixed(1)}</span>
+                      <span style={{ color: '#10B981' }}><ArrowUpOutlined /> +{growth.understandingDelta.toFixed(1)}</span>
                     ) : (
                       <span style={{ color: '#ff4d4f' }}><ArrowDownOutlined /> {growth.understandingDelta.toFixed(1)}</span>
                     )}
@@ -168,7 +168,7 @@ const MonthlyReportView: React.FC = () => {
                       <XAxis dataKey="week" />
                       <YAxis domain={[0, 100]} unit="%" />
                       <Tooltip formatter={(value: number) => `${value}%`} />
-                      <Area type="monotone" dataKey="goalRate" stroke="#1677ff" fill="#e6f4ff" name="달성률" />
+                      <Area type="monotone" dataKey="goalRate" stroke="#7C3AED" fill="#E8D5F5" name="달성률" />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
@@ -184,7 +184,7 @@ const MonthlyReportView: React.FC = () => {
                       <PolarGrid />
                       <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
                       <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                      <Radar name="진행률" dataKey="progress" stroke="#1677ff" fill="#1677ff" fillOpacity={0.3} />
+                      <Radar name="진행률" dataKey="progress" stroke="#7C3AED" fill="rgba(124, 58, 237, 0.2)" fillOpacity={0.3} />
                     </RadarChart>
                   </ResponsiveContainer>
                 ) : (

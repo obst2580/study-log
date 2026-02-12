@@ -69,7 +69,7 @@ const Dashboard: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6}>
-          <Card size="small">
+          <Card size="small" style={{ background: '#DBEAFE', borderColor: '#DBEAFE', borderRadius: 12 }}>
             <Statistic
               title="오늘 할 것"
               value={todayTopics}
@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Card size="small">
+          <Card size="small" style={{ background: '#C8F7DC', borderColor: '#C8F7DC', borderRadius: 12 }}>
             <Statistic
               title="완료된 토픽"
               value={doneTopics}

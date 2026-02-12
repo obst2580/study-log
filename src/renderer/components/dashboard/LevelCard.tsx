@@ -14,10 +14,10 @@ const LevelCard: React.FC<LevelCardProps> = ({ totalXp }) => {
   const xpNeeded = nextLevelXp - currentLevelXp;
 
   return (
-    <Card size="small">
+    <Card size="small" style={{ background: 'var(--pastel-lavender)', borderRadius: 20, border: 'none' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <StarOutlined style={{ color: '#faad14', fontSize: 20 }} />
-        <span style={{ fontSize: 20, fontWeight: 700 }}>Lv.{level}</span>
+        <StarOutlined style={{ color: '#faad14', fontSize: 24 }} />
+        <span style={{ fontSize: 32, fontWeight: 800 }}>Lv.{level}</span>
       </div>
       <Progress
         percent={progressPercent}

@@ -32,11 +32,11 @@ const LoginForm: React.FC = () => {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '100vh',
-      background: 'var(--bg-color, #f5f5f5)',
+      background: 'linear-gradient(135deg, #E8D5F5 0%, #DBEAFE 100%)',
     }}>
-      <Card style={{ width: 400, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Card style={{ width: 400, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <Title level={2} style={{ marginBottom: 4 }}>StudyLog</Title>
+          <Title level={2} style={{ marginBottom: 4, fontSize: 32, fontWeight: 800 }}>StudyLog</Title>
           <Text type="secondary">학습 관리 시스템에 로그인하세요</Text>
         </div>
 
@@ -49,7 +49,7 @@ const LoginForm: React.FC = () => {
               { type: 'email', message: '올바른 이메일 형식이 아닙니다' },
             ]}
           >
-            <Input prefix={<MailOutlined />} placeholder="이메일" size="large" />
+            <Input prefix={<MailOutlined />} placeholder="이메일" size="large" style={{ borderRadius: 12 }} />
           </Form.Item>
 
           <Form.Item
@@ -57,11 +57,11 @@ const LoginForm: React.FC = () => {
             label="비밀번호"
             rules={[{ required: true, message: '비밀번호를 입력하세요' }]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="비밀번호" size="large" />
+            <Input.Password prefix={<LockOutlined />} placeholder="비밀번호" size="large" style={{ borderRadius: 12 }} />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block size="large">
+            <Button type="primary" htmlType="submit" loading={loading} block size="large" style={{ borderRadius: 9999, background: '#7C3AED' }}>
               로그인
             </Button>
           </Form.Item>

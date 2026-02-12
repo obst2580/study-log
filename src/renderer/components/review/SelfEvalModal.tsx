@@ -180,7 +180,7 @@ const SelfEvalModal: React.FC<SelfEvalModalProps> = ({
               <Progress
                 percent={Math.round((Math.min(nextMasteryCount, MASTERY_THRESHOLD) / MASTERY_THRESHOLD) * 100)}
                 size="small"
-                strokeColor={willMaster ? '#10B981' : '#F59E0B'}
+                strokeColor={willMaster ? '#10B981' : '#D97706'}
                 showInfo={false}
               />
             </div>

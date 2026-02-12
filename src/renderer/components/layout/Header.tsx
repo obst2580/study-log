@@ -1,24 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Badge, Space, Tooltip, Switch, Popover, List, Typography, Empty, Tag } from 'antd';
+import { Button, Badge, Tooltip, Popover, List, Typography, Empty } from 'antd';
 import {
   SearchOutlined,
-  ClockCircleOutlined,
   BellOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  SunOutlined,
-  MoonOutlined,
   CheckOutlined,
-  FireOutlined,
-  StarOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../stores/appStore';
-import { useTimerStore } from '../../stores/timerStore';
-import { formatTime } from '../../hooks/useTimer';
 import { useNotification } from '../../hooks/useNotification';
-import { useUserStats } from '../../hooks/useDatabase';
-import { calculateLevel } from '../../utils/xp';
+import { useAuthStore } from '../../stores/authStore';
 import GlobalSearch from '../search/GlobalSearch';
 
 const { Text } = Typography;
@@ -27,18 +17,7 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const theme = useAppStore((s) => s.theme);
   const setTheme = useAppStore((s) => s.setTheme);
-  const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
-  const toggleSidebar = useAppStore((s) => s.toggleSidebar);
-  const reviewsDueCount = useAppStore((s) => s.reviewsDueCount);
-
-  const isTimerRunning = useTimerStore((s) => s.isRunning);
-  const timerType = useTimerStore((s) => s.timerType);
-  const elapsedSeconds = useTimerStore((s) => s.elapsedSeconds);
-  const pomodoroRemainingSeconds = useTimerStore((s) => s.pomodoroRemainingSeconds);
-  const toggleMinimized = useTimerStore((s) => s.toggleMinimized);
-  const minimized = useTimerStore((s) => s.minimized);
-
-  const { stats } = useUserStats();
+  const user = useAuthStore((s) => s.user);
 
   const {
     notifications,
@@ -50,10 +29,6 @@ const Header: React.FC = () => {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
-
-  const currentStreak = stats?.currentStreak ?? 0;
-  const totalXp = stats?.totalXp ?? 0;
-  const level = calculateLevel(totalXp);
 
   // Global Ctrl+K shortcut
   useEffect(() => {
@@ -67,77 +42,35 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const timerDisplay = timerType === 'stopwatch'
-    ? formatTime(elapsedSeconds)
-    : formatTime(pomodoroRemainingSeconds);
-
   const handleSearchSelectTopic = useCallback((topicId: string) => {
     navigate('/kanban');
     useAppStore.getState().setSearchSelectedTopicId(topicId);
   }, [navigate]);
 
-  const handleTimerClick = () => {
-    if (isTimerRunning && !minimized) {
-      // If timer is running on the timer page, minimize it
-      toggleMinimized();
-    }
-    navigate('/timer');
-  };
-
-  const notificationTypeColors: Record<string, string> = {
-    review: '#6366F1',
-    streak: '#faad14',
-    exam: '#722ed1',
-    info: '#52c41a',
-  };
-
   const notificationContent = (
     <div style={{ width: 320 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Text strong>알림</Text>
+        <Text strong>Notifications</Text>
         {unreadCount > 0 && (
-          <Button
-            type="link"
-            size="small"
-            onClick={markAllAsRead}
-            icon={<CheckOutlined />}
-            style={{ fontSize: 11 }}
-          >
-            모두 읽음
+          <Button type="link" size="small" onClick={markAllAsRead} icon={<CheckOutlined />} style={{ fontSize: 11 }}>
+            Mark all read
           </Button>
         )}
       </div>
       {notifications.length === 0 ? (
-        <Empty
-          description="알림이 없습니다"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          style={{ padding: '16px 0' }}
-        />
+        <Empty description="No notifications" image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ padding: '16px 0' }} />
       ) : (
         <List
           dataSource={notifications.slice(0, 10)}
           style={{ maxHeight: 300, overflow: 'auto' }}
           renderItem={(item) => (
             <List.Item
-              style={{
-                padding: '8px 4px',
-                cursor: 'pointer',
-                opacity: item.read ? 0.6 : 1,
-                borderLeft: `3px solid ${notificationTypeColors[item.type] ?? '#999'}`,
-                paddingLeft: 8,
-              }}
+              style={{ padding: '8px 4px', cursor: 'pointer', opacity: item.read ? 0.6 : 1 }}
               onClick={() => markAsRead(item.id)}
             >
               <div>
-                <Text strong={!item.read} style={{ fontSize: 12 }}>
-                  {item.title}
-                </Text>
-                <Text
-                  type="secondary"
-                  style={{ display: 'block', fontSize: 11, marginTop: 2 }}
-                >
-                  {item.body}
-                </Text>
+                <Text strong={!item.read} style={{ fontSize: 12 }}>{item.title}</Text>
+                <Text type="secondary" style={{ display: 'block', fontSize: 11, marginTop: 2 }}>{item.body}</Text>
               </div>
             </List.Item>
           )}
@@ -146,58 +79,25 @@ const Header: React.FC = () => {
     </div>
   );
 
+  const initial = (user?.name ?? 'U').charAt(0).toUpperCase();
+
   return (
     <>
       {contextHolder}
       <header className="app-header" role="banner">
-        <Space style={{ flex: 1 }} align="center">
+        {/* Left: Search */}
+        <Tooltip title="Search (Ctrl+K)">
           <Button
             type="text"
-            icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={toggleSidebar}
-            aria-label={sidebarCollapsed ? '사이드바 열기' : '사이드바 닫기'}
+            icon={<SearchOutlined style={{ fontSize: 18 }} />}
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search (Ctrl+K)"
+            style={{ color: 'var(--text-secondary)' }}
           />
-          <span style={{ fontWeight: 700, fontSize: 16 }}>StudyLog</span>
-          <Space size={4}>
-            <Tag
-              icon={<FireOutlined />}
-              color="#F59E0B"
-              style={{ margin: 0, fontSize: 11, fontWeight: 600, borderRadius: 12 }}
-            >
-              {currentStreak}일
-            </Tag>
-            <Tag
-              icon={<StarOutlined />}
-              color="#6366F1"
-              style={{ margin: 0, fontSize: 11, fontWeight: 600, borderRadius: 12 }}
-            >
-              Lv.{level}
-            </Tag>
-          </Space>
-        </Space>
+        </Tooltip>
 
-        <Space size="middle" align="center">
-          <Tooltip title="검색 (Ctrl+K)">
-            <Button
-              type="text"
-              icon={<SearchOutlined />}
-              onClick={() => setSearchOpen(true)}
-              aria-label="검색 열기 (Ctrl+K)"
-            />
-          </Tooltip>
-
-          <Tooltip title={isTimerRunning ? '타이머 진행 중' : '타이머'}>
-            <Button
-              type="text"
-              icon={<ClockCircleOutlined />}
-              style={isTimerRunning ? { color: '#6366F1', fontWeight: 600 } : undefined}
-              onClick={handleTimerClick}
-              aria-label={isTimerRunning ? `타이머: ${timerDisplay}` : '타이머'}
-            >
-              {isTimerRunning ? timerDisplay : null}
-            </Button>
-          </Tooltip>
-
+        {/* Right: Bell + Theme + Avatar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Popover
             content={notificationContent}
             trigger="click"
@@ -205,28 +105,46 @@ const Header: React.FC = () => {
             onOpenChange={setNotificationOpen}
             placement="bottomRight"
           >
-            <Tooltip title={`알림: ${unreadCount > 0 ? `${unreadCount}개 읽지 않음` : '없음'}`}>
-              <Badge count={unreadCount} size="small">
-                <Button
-                  type="text"
-                  icon={<BellOutlined />}
-                  aria-label={`알림: ${unreadCount}개 읽지 않음`}
-                />
-              </Badge>
-            </Tooltip>
+            <Badge count={unreadCount} size="small">
+              <Button
+                type="text"
+                icon={<BellOutlined style={{ fontSize: 18 }} />}
+                aria-label={`Notifications: ${unreadCount} unread`}
+                style={{ color: 'var(--text-secondary)' }}
+              />
+            </Badge>
           </Popover>
 
-          <Tooltip title={theme === 'dark' ? '라이트 모드' : '다크 모드'}>
-            <Switch
-              checked={theme === 'dark'}
-              onChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-              checkedChildren={<MoonOutlined />}
-              unCheckedChildren={<SunOutlined />}
-              size="small"
-              aria-label="테마 전환"
-            />
-          </Tooltip>
-        </Space>
+          {/* Theme toggle as small text button */}
+          <Button
+            type="text"
+            size="small"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle theme"
+            style={{ fontSize: 16, color: 'var(--text-secondary)', padding: '0 4px' }}
+          >
+            {theme === 'dark' ? '\u263E' : '\u2600'}
+          </Button>
+
+          {/* User avatar circle */}
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              background: '#7C3AED',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#FFFFFF',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'default',
+            }}
+          >
+            {initial}
+          </div>
+        </div>
       </header>
 
       <GlobalSearch

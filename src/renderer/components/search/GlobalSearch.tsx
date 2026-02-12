@@ -227,7 +227,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose, onSelectTopi
                   style={{
                     padding: '8px 16px 8px 28px',
                     cursor: 'pointer',
-                    backgroundColor: isSelected ? 'rgba(24, 144, 255, 0.06)' : undefined,
+                    backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.06)' : undefined,
                     transition: 'background-color 0.15s ease',
                   }}
                   onClick={() => handleSelect(topic.id)}

@@ -18,9 +18,9 @@ const PHASE_LABELS: Record<string, string> = {
 };
 
 const PHASE_COLORS: Record<string, string> = {
-  focus: '#1890ff',
-  shortBreak: '#52c41a',
-  longBreak: '#faad14',
+  focus: '#7C3AED',
+  shortBreak: '#10B981',
+  longBreak: '#D97706',
 };
 
 const PHASE_DESCRIPTIONS: Record<string, string> = {
@@ -116,7 +116,7 @@ const Pomodoro: React.FC = () => {
           format={() => formatTime(remainingSeconds)}
           strokeColor={{
             '0%': PHASE_COLORS[pomodoroPhase],
-            '100%': pomodoroPhase === 'focus' ? '#096dd9' : pomodoroPhase === 'shortBreak' ? '#389e0d' : '#d48806',
+            '100%': pomodoroPhase === 'focus' ? '#5B21B6' : pomodoroPhase === 'shortBreak' ? '#065F46' : '#92400E',
           }}
           size={180}
           strokeWidth={6}

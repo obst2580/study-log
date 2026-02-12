@@ -16,8 +16,13 @@ function Root() {
       theme={{
         algorithm: themeSetting === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
         token: {
-          colorPrimary: '#1890ff',
-          borderRadius: 6,
+          colorPrimary: '#7C3AED',
+          colorSuccess: '#2D8B5F',
+          colorWarning: '#D97706',
+          colorError: '#DC2626',
+          borderRadius: 16,
+          fontSize: 15,
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
         },
       }}
     >

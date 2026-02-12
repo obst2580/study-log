@@ -100,13 +100,13 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
         <div className="kanban-card-meta">
           <Tag
             color={DIFFICULTY_COLORS[topic.difficulty]}
-            style={{ fontSize: 11, lineHeight: '18px', padding: '0 4px' }}
+            style={{ fontSize: 11, lineHeight: '18px', padding: '0 8px', borderRadius: 9999 }}
           >
             난이도 {DIFFICULTY_LABELS[topic.difficulty]}
           </Tag>
           <Tag
             color={IMPORTANCE_COLORS[topic.importance]}
-            style={{ fontSize: 11, lineHeight: '18px', padding: '0 4px' }}
+            style={{ fontSize: 11, lineHeight: '18px', padding: '0 8px', borderRadius: 9999 }}
           >
             중요도 {IMPORTANCE_LABELS[topic.importance]}
           </Tag>
@@ -162,7 +162,14 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
               type="text"
               size="small"
               icon={<PlayCircleOutlined />}
-              style={{ color: 'var(--brand-primary)', fontWeight: 600, fontSize: 12 }}
+              style={{
+                color: 'var(--pastel-lavender-text, #7C3AED)',
+                fontWeight: 600,
+                fontSize: 12,
+                background: 'var(--pastel-lavender)',
+                borderRadius: 9999,
+                padding: '0 12px',
+              }}
               aria-label={`${topic.title} 공부 시작`}
               onClick={handleStartStudy}
             >

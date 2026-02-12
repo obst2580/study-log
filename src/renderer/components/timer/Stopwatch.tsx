@@ -83,7 +83,7 @@ const Stopwatch: React.FC = () => {
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: 2,
           margin: '16px 0',
-          color: isRunning ? '#1890ff' : undefined,
+          color: isRunning ? '#7C3AED' : undefined,
           transition: 'color 0.3s ease',
         }}
       >
@@ -150,8 +150,8 @@ const Stopwatch: React.FC = () => {
             }}
           />
           <style>{`
-            .lap-fastest td { color: #52c41a !important; }
-            .lap-slowest td { color: #f5222d !important; }
+            .lap-fastest td { color: #10B981 !important; }
+            .lap-slowest td { color: #DC2626 !important; }
           `}</style>
         </div>
       )}

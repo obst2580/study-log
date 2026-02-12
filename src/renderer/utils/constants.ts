@@ -21,15 +21,15 @@ export const IMPORTANCE_LABELS: Record<string, string> = {
 };
 
 export const DIFFICULTY_COLORS: Record<string, string> = {
-  high: '#f5222d',
-  medium: '#faad14',
-  low: '#52c41a',
+  high: '#F43F5E',
+  medium: '#D97706',
+  low: '#10B981',
 };
 
 export const IMPORTANCE_COLORS: Record<string, string> = {
-  high: '#f5222d',
-  medium: '#faad14',
-  low: '#52c41a',
+  high: '#F43F5E',
+  medium: '#D97706',
+  low: '#10B981',
 };
 
 export const COLUMN_LABELS: Record<string, string> = {
@@ -40,15 +40,15 @@ export const COLUMN_LABELS: Record<string, string> = {
 };
 
 export const COLUMN_COLORS: Record<string, string> = {
-  backlog: '#d9d9d9',
-  today: '#1890ff',
-  reviewing: '#722ed1',
-  mastered: '#52c41a',
+  backlog: '#EAB308',
+  today: '#3B82F6',
+  reviewing: '#F43F5E',
+  mastered: '#10B981',
 };
 
 export const SUBJECT_PRESET_COLORS = [
-  '#1890ff', '#722ed1', '#13c2c2', '#fa8c16', '#f5222d',
-  '#52c41a', '#eb2f96', '#faad14', '#2f54eb', '#a0d911',
+  '#7C3AED', '#2563EB', '#0D9488', '#D97706', '#DC2626',
+  '#059669', '#DB2777', '#EA580C', '#4F46E5', '#65A30D',
 ];
 
 export const XP_PER_CARD_REVIEW = 10;

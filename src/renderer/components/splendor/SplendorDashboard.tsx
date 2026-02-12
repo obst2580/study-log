@@ -61,7 +61,7 @@ const SplendorDashboard: React.FC = () => {
             <Statistic
               title="프레스티지"
               value={prestigePoints}
-              prefix={<CrownOutlined style={{ color: '#faad14' }} />}
+              prefix={<CrownOutlined style={{ color: '#D97706' }} />}
               suffix="점"
             />
           </Card>
@@ -130,7 +130,7 @@ const SplendorDashboard: React.FC = () => {
                     <GemIcon type={tx.gemType} size={14} />
                     <span style={{
                       fontWeight: 600,
-                      color: tx.amount > 0 ? '#52c41a' : '#ff4d4f',
+                      color: tx.amount > 0 ? '#10B981' : '#ff4d4f',
                     }}>
                       {tx.amount > 0 ? '+' : ''}{tx.amount}
                     </span>

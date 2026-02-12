@@ -1,291 +1,135 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, Button, Modal, Input, ColorPicker } from 'antd';
 import {
+  HomeOutlined,
   AppstoreOutlined,
-  DashboardOutlined,
-  CalendarOutlined,
-  FieldTimeOutlined,
-  PlusOutlined,
-  RobotOutlined,
-  SettingOutlined,
   BookOutlined,
   ClockCircleOutlined,
-  TeamOutlined,
-  SwapOutlined,
-  FormOutlined,
-  StarOutlined,
-  BarChartOutlined,
-  FlagOutlined,
-  LineChartOutlined,
-  GoldOutlined,
-  HomeOutlined,
+  DashboardOutlined,
+  SettingOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
-import { useAppStore } from '../../stores/appStore';
 import { useAuthStore } from '../../stores/authStore';
-import { apiService } from '../../api/apiService';
-import { SUBJECT_PRESET_COLORS } from '../../utils/constants';
+
+interface NavItem {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { key: '/', icon: <HomeOutlined />, label: 'Home' },
+  { key: '/kanban', icon: <AppstoreOutlined />, label: 'Kanban' },
+  { key: '/curriculum', icon: <BookOutlined />, label: 'Courses' },
+  { key: '/timer', icon: <ClockCircleOutlined />, label: 'Timer' },
+  { key: '/dashboard', icon: <DashboardOutlined />, label: 'Stats' },
+];
+
+const BOTTOM_ITEMS: NavItem[] = [
+  { key: '/settings', icon: <SettingOutlined />, label: 'Settings' },
+];
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const subjects = useAppStore((s) => s.subjects);
-  const selectedSubjectId = useAppStore((s) => s.selectedSubjectId);
-  const setSelectedSubject = useAppStore((s) => s.setSelectedSubject);
-  const loadSubjects = useAppStore((s) => s.loadSubjects);
-  const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
-  const { user, logout } = useAuthStore();
+  const { logout } = useAuthStore();
 
-  const isParent = user?.role === 'parent';
+  const isActive = (key: string) => location.pathname === key;
 
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [newSubjectName, setNewSubjectName] = useState('');
-  const [newSubjectColor, setNewSubjectColor] = useState(SUBJECT_PRESET_COLORS[0]);
-
-  const handleAddSubject = async () => {
-    if (!newSubjectName.trim()) return;
-    await apiService.createSubject({
-      name: newSubjectName.trim(),
-      color: newSubjectColor,
-    });
-    setNewSubjectName('');
-    setNewSubjectColor(SUBJECT_PRESET_COLORS[0]);
-    setAddModalOpen(false);
-    await loadSubjects();
-  };
-
-  const handleSubjectClick = (subjectId: string | null) => {
-    setSelectedSubject(subjectId);
-    navigate('/kanban');
-  };
-
-  const viewItems = [
-    // 홈
-    { key: '/', icon: <HomeOutlined />, label: '홈' },
-    // 학습 (Study) - always expanded
-    { key: '/kanban', icon: <AppstoreOutlined />, label: '칸반 보드' },
-    { key: '/curriculum', icon: <BookOutlined />, label: '커리큘럼 관리' },
-    { key: '/timer', icon: <ClockCircleOutlined />, label: '타이머' },
-
-    // 기록 (Records) - item group
-    {
-      type: 'group' as const,
-      label: '기록',
-      children: [
-        { key: '/dashboard', icon: <DashboardOutlined />, label: '대시보드' },
-        { key: '/calendar', icon: <CalendarOutlined />, label: '달력' },
-        { key: '/timeline', icon: <FieldTimeOutlined />, label: '타임라인' },
-        { key: '/report', icon: <BarChartOutlined />, label: '월간 리포트' },
-        { key: '/analysis', icon: <LineChartOutlined />, label: '학습 패턴' },
-        { key: '/reflection', icon: <FormOutlined />, label: '주간 성찰' },
-      ]
-    },
-
-    // 도전 (Challenges) - item group
-    {
-      type: 'group' as const,
-      label: '도전',
-      children: [
-        { key: '/achievements', icon: <StarOutlined />, label: '업적' },
-        { key: '/challenges', icon: <FlagOutlined />, label: '챌린지' },
-        { key: '/splendor', icon: <GoldOutlined />, label: '보석 상점' },
-      ]
-    }
-  ];
-
-  const subjectItems = [
-    {
-      key: 'all',
-      icon: <BookOutlined />,
-      label: '전체',
-      onClick: () => handleSubjectClick(null),
-    },
-    ...subjects.map((s) => ({
-      key: s.id,
-      icon: <BookOutlined style={{ color: s.color }} />,
-      label: s.name,
-      onClick: () => handleSubjectClick(s.id),
-    })),
-  ];
-
-  const bottomItems = [
-    { key: '/ai', icon: <RobotOutlined />, label: 'AI 채팅' },
-    ...(isParent ? [{ key: '/parent', icon: <TeamOutlined />, label: '보호자 대시보드' }] : []),
-    { key: '/settings', icon: <SettingOutlined />, label: '설정' },
-  ];
-
-  if (sidebarCollapsed) {
-    const studyItems = [
-      { key: '/', icon: <HomeOutlined />, label: '홈' },
-      { key: '/kanban', icon: <AppstoreOutlined />, label: '칸반 보드' },
-      { key: '/curriculum', icon: <BookOutlined />, label: '커리큘럼 관리' },
-      { key: '/timer', icon: <ClockCircleOutlined />, label: '타이머' },
-    ];
-
-    const recordItems = [
-      { key: '/dashboard', icon: <DashboardOutlined />, label: '대시보드' },
-      { key: '/calendar', icon: <CalendarOutlined />, label: '달력' },
-      { key: '/timeline', icon: <FieldTimeOutlined />, label: '타임라인' },
-      { key: '/report', icon: <BarChartOutlined />, label: '월간 리포트' },
-      { key: '/analysis', icon: <LineChartOutlined />, label: '학습 패턴' },
-      { key: '/reflection', icon: <FormOutlined />, label: '주간 성찰' },
-    ];
-
-    const challengeItems = [
-      { key: '/achievements', icon: <StarOutlined />, label: '업적' },
-      { key: '/challenges', icon: <FlagOutlined />, label: '챌린지' },
-      { key: '/splendor', icon: <GoldOutlined />, label: '보석 상점' },
-    ];
-
+  const renderItem = (item: NavItem) => {
+    const active = isActive(item.key);
     return (
-      <div
-        style={{ padding: '8px 4px', display: 'flex', flexDirection: 'column', gap: 4 }}
-        role="navigation"
-        aria-label="주요 내비게이션"
+      <button
+        key={item.key}
+        onClick={() => navigate(item.key)}
+        aria-label={item.label}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4,
+          padding: '10px 0',
+          border: 'none',
+          background: 'transparent',
+          cursor: 'pointer',
+          color: active ? '#F43F5E' : 'var(--text-muted)',
+          transition: 'color 0.15s ease',
+          width: '100%',
+        }}
       >
-        {studyItems.map((item) => (
-          <Button
-            key={item.key}
-            type={location.pathname === item.key ? 'primary' : 'text'}
-            icon={item.icon}
-            size="small"
-            onClick={() => navigate(item.key)}
-            aria-label={item.label}
-            title={item.label}
-          />
-        ))}
-        <div style={{ height: 1, background: 'var(--border-color, #f0f0f0)', margin: '4px 0' }} />
-        {recordItems.map((item) => (
-          <Button
-            key={item.key}
-            type={location.pathname === item.key ? 'primary' : 'text'}
-            icon={item.icon}
-            size="small"
-            onClick={() => navigate(item.key)}
-            aria-label={item.label}
-            title={item.label}
-          />
-        ))}
-        <div style={{ height: 1, background: 'var(--border-color, #f0f0f0)', margin: '4px 0' }} />
-        {challengeItems.map((item) => (
-          <Button
-            key={item.key}
-            type={location.pathname === item.key ? 'primary' : 'text'}
-            icon={item.icon}
-            size="small"
-            onClick={() => navigate(item.key)}
-            aria-label={item.label}
-            title={item.label}
-          />
-        ))}
-        <div style={{ flex: 1 }} />
-        {bottomItems.map((item) => (
-          <Button
-            key={item.key}
-            type={location.pathname === item.key ? 'primary' : 'text'}
-            icon={item.icon}
-            size="small"
-            onClick={() => navigate(item.key)}
-            aria-label={item.label}
-            title={item.label}
-          />
-        ))}
-      </div>
+        <span style={{ fontSize: 22 }}>{item.icon}</span>
+        <span style={{
+          fontSize: 10,
+          fontWeight: active ? 700 : 500,
+          letterSpacing: '0.02em',
+        }}>
+          {item.label}
+        </span>
+      </button>
     );
-  }
+  };
 
   return (
     <div
-      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
       role="navigation"
-      aria-label="주요 내비게이션"
+      aria-label="Main navigation"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: '100%',
+        paddingTop: 16,
+        paddingBottom: 12,
+      }}
     >
-      <Menu
-        mode="inline"
-        selectedKeys={[location.pathname]}
-        items={viewItems}
-        onClick={({ key }) => navigate(key)}
-        style={{ borderRight: 0 }}
-      />
-
-      <div style={{ padding: '8px 16px', fontWeight: 600, fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-        과목
+      {/* Logo */}
+      <div style={{
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        background: '#F43F5E',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: 800,
+        marginBottom: 24,
+        flexShrink: 0,
+      }}>
+        S
       </div>
 
-      <Menu
-        mode="inline"
-        selectedKeys={selectedSubjectId ? [selectedSubjectId] : ['all']}
-        items={subjectItems}
-        style={{ borderRight: 0, flex: 1, overflowY: 'auto' }}
-      />
-
-      <div style={{ padding: '4px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <Button
-          type="dashed"
-          icon={<PlusOutlined />}
-          block
-          size="small"
-          onClick={() => setAddModalOpen(true)}
-        >
-          과목 추가
-        </Button>
+      {/* Main nav items */}
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}>
+        {NAV_ITEMS.map(renderItem)}
       </div>
 
-      <div style={{ borderTop: '1px solid var(--border-color, #f0f0f0)', marginTop: 8 }}>
-        <Menu
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={bottomItems}
-          onClick={({ key }) => navigate(key)}
-          style={{ borderRight: 0 }}
-        />
-      </div>
+      <div style={{ flex: 1 }} />
 
-      <Modal
-        title="과목 추가"
-        open={addModalOpen}
-        onOk={handleAddSubject}
-        onCancel={() => setAddModalOpen(false)}
-        okText="추가"
-        cancelText="취소"
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div>
-            <label
-              htmlFor="new-subject-name"
-              style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}
-            >
-              과목명
-            </label>
-            <Input
-              id="new-subject-name"
-              value={newSubjectName}
-              onChange={(e) => setNewSubjectName(e.target.value)}
-              placeholder="예: 수학"
-              onPressEnter={handleAddSubject}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>색상</label>
-            <ColorPicker
-              value={newSubjectColor}
-              onChange={(_, hex) => setNewSubjectColor(hex)}
-              presets={[{ label: '추천 색상', colors: SUBJECT_PRESET_COLORS }]}
-            />
-          </div>
-        </div>
-      </Modal>
-
-      <div style={{ padding: '4px 16px', borderTop: '1px solid var(--border-color, #f0f0f0)' }}>
-        <Button
-          type="text"
-          icon={<SwapOutlined />}
-          block
-          size="small"
+      {/* Bottom items */}
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}>
+        {BOTTOM_ITEMS.map(renderItem)}
+        <button
           onClick={logout}
+          aria-label="Logout"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+            padding: '10px 0',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            color: 'var(--text-muted)',
+            transition: 'color 0.15s ease',
+            width: '100%',
+          }}
         >
-          로그아웃
-        </Button>
+          <span style={{ fontSize: 22 }}><LogoutOutlined /></span>
+          <span style={{ fontSize: 10, fontWeight: 500 }}>Logout</span>
+        </button>
       </div>
     </div>
   );

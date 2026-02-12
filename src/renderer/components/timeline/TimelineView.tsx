@@ -57,7 +57,7 @@ const TimelineView: React.FC = () => {
           timestamp: s.startedAt,
           title: '학습 세션',
           description: `${Math.round(s.duration / 60)}분 학습 (${s.timerType === 'pomodoro' ? '뽀모도로' : '스톱워치'})`,
-          color: '#1890ff',
+          color: '#7C3AED',
           icon: <ClockCircleOutlined />,
         });
       }
@@ -75,7 +75,7 @@ const TimelineView: React.FC = () => {
         timestamp: exam.date,
         title: exam.name,
         description: daysUntil >= 0 ? `D-${daysUntil}` : `${Math.abs(daysUntil)}일 전`,
-        color: '#f5222d',
+        color: '#DC2626',
         icon: <CalendarOutlined />,
       });
     }

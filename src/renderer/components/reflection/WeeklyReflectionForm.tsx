@@ -105,7 +105,7 @@ const WeeklyReflectionForm: React.FC = () => {
       </div>
 
       {showPrompt && (
-        <Card size="small" style={{ marginBottom: 16, background: '#fff7e6', borderColor: '#ffd591' }}>
+        <Card size="small" style={{ marginBottom: 16, background: '#FEF3C7', borderColor: '#FDE68A', borderRadius: 12 }}>
           <p style={{ margin: 0 }}>이번 주를 돌아보고 성찰을 작성해 보세요.</p>
         </Card>
       )}
@@ -195,9 +195,9 @@ const WeeklyReflectionForm: React.FC = () => {
                     <div style={{ fontWeight: 500, marginBottom: 4 }}>
                       {r.weekStart} <Rate disabled value={r.mood} style={{ fontSize: 12, marginLeft: 8 }} />
                     </div>
-                    {r.whatWentWell && <p style={{ margin: '4px 0', color: '#52c41a' }}>잘한 점: {r.whatWentWell}</p>}
-                    {r.whatToImprove && <p style={{ margin: '4px 0', color: '#faad14' }}>개선할 점: {r.whatToImprove}</p>}
-                    {r.nextWeekFocus && <p style={{ margin: '4px 0', color: '#1677ff' }}>집중할 것: {r.nextWeekFocus}</p>}
+                    {r.whatWentWell && <p style={{ margin: '4px 0', color: '#10B981' }}>잘한 점: {r.whatWentWell}</p>}
+                    {r.whatToImprove && <p style={{ margin: '4px 0', color: '#D97706' }}>개선할 점: {r.whatToImprove}</p>}
+                    {r.nextWeekFocus && <p style={{ margin: '4px 0', color: '#7C3AED' }}>집중할 것: {r.nextWeekFocus}</p>}
                   </div>
                 ),
               }))}

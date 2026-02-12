@@ -291,7 +291,7 @@ const AiChat: React.FC = () => {
                   size="small"
                   icon={msg.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
                   style={{
-                    backgroundColor: msg.role === 'user' ? '#1890ff' : '#52c41a',
+                    backgroundColor: msg.role === 'user' ? '#7C3AED' : '#10B981',
                     flexShrink: 0,
                   }}
                   aria-hidden="true"
@@ -299,7 +299,7 @@ const AiChat: React.FC = () => {
                 <div style={{ maxWidth: '85%', minWidth: 0 }}>
                   <div
                     style={{
-                      background: msg.role === 'user' ? '#e6f4ff' : '#f6ffed',
+                      background: msg.role === 'user' ? '#E8D5F5' : '#C8F7DC',
                       padding: '8px 12px',
                       borderRadius: 8,
                       whiteSpace: 'pre-wrap',
@@ -329,12 +329,12 @@ const AiChat: React.FC = () => {
             <Avatar
               size="small"
               icon={<RobotOutlined />}
-              style={{ backgroundColor: '#52c41a', flexShrink: 0 }}
+              style={{ backgroundColor: '#10B981', flexShrink: 0 }}
               aria-hidden="true"
             />
             <div
               style={{
-                background: '#f6ffed',
+                background: '#C8F7DC',
                 padding: '8px 12px',
                 borderRadius: 8,
                 display: 'flex',

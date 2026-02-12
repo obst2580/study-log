@@ -15,7 +15,7 @@ import type { ChildSummary, WeeklyActivity } from '../../../shared/types';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-const ACTIVITY_COLORS = ['#f0f0f0', '#d6e4ff', '#85a5ff', '#2f54eb', '#10239e'];
+const ACTIVITY_COLORS = ['#f0f0f0', '#E8D5F5', '#C4A6E8', '#9B6FD4', '#7C3AED'];
 
 function getActivityColor(minutes: number): string {
   if (minutes === 0) return ACTIVITY_COLORS[0];
@@ -129,9 +129,9 @@ const ChildTab: React.FC<ChildTabProps> = ({ userId }) => {
                   <XAxis type="number" domain={[0, 100]} unit="%" />
                   <YAxis type="category" dataKey="name" width={80} />
                   <Tooltip formatter={(value: number) => `${value}%`} />
-                  <Bar dataKey="ratio" fill="#1677ff" radius={[0, 4, 4, 0]}>
+                  <Bar dataKey="ratio" fill="#7C3AED" radius={[0, 4, 4, 0]}>
                     {chartData.map((entry, index) => (
-                      <Cell key={index} fill={entry.ratio >= 80 ? '#52c41a' : entry.ratio >= 50 ? '#faad14' : '#1677ff'} />
+                      <Cell key={index} fill={entry.ratio >= 80 ? '#10B981' : entry.ratio >= 50 ? '#D97706' : '#7C3AED'} />
                     ))}
                   </Bar>
                 </BarChart>

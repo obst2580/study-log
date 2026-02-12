@@ -10,10 +10,10 @@ const DAYS_PER_WEEK = 7;
 
 const INTENSITY_COLORS = [
   '#ebedf0', // 0
-  '#9be9a8', // 1-2
-  '#40c463', // 3-4
-  '#30a14e', // 5-7
-  '#216e39', // 8+
+  '#C8F7DC', // 1-2
+  '#6DD4A0', // 3-4
+  '#3EAF73', // 5-7
+  '#2D8B5F', // 8+
 ];
 
 function getIntensityColor(count: number): string {

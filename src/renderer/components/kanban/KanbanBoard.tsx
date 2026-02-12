@@ -191,8 +191,8 @@ const KanbanBoard: React.FC = () => {
             size="small"
             style={{
               background: STATUS_CARD_STYLES.backlog.background,
-              border: `1px solid ${STATUS_CARD_STYLES.backlog.borderColor}`,
-              borderRadius: 12,
+              border: `2px solid ${STATUS_CARD_STYLES.backlog.borderColor}`,
+              borderRadius: 16,
               cursor: 'pointer',
             }}
             styles={{ body: { padding: '12px 16px' } }}
@@ -217,8 +217,8 @@ const KanbanBoard: React.FC = () => {
             size="small"
             style={{
               background: STATUS_CARD_STYLES.today.background,
-              border: `1px solid ${STATUS_CARD_STYLES.today.borderColor}`,
-              borderRadius: 12,
+              border: `2px solid ${STATUS_CARD_STYLES.today.borderColor}`,
+              borderRadius: 16,
             }}
             styles={{ body: { padding: '12px 16px' } }}
           >
@@ -245,8 +245,8 @@ const KanbanBoard: React.FC = () => {
             size="small"
             style={{
               background: STATUS_CARD_STYLES.reviewing.background,
-              border: `1px solid ${STATUS_CARD_STYLES.reviewing.borderColor}`,
-              borderRadius: 12,
+              border: `2px solid ${STATUS_CARD_STYLES.reviewing.borderColor}`,
+              borderRadius: 16,
             }}
             styles={{ body: { padding: '12px 16px' } }}
           >
@@ -270,8 +270,8 @@ const KanbanBoard: React.FC = () => {
               size="small"
               style={{
                 background: STATUS_CARD_STYLES.mastered.background,
-                border: `1px solid ${STATUS_CARD_STYLES.mastered.borderColor}`,
-                borderRadius: 12,
+                border: `2px solid ${STATUS_CARD_STYLES.mastered.borderColor}`,
+                borderRadius: 16,
               }}
               styles={{ body: { padding: '12px 16px' } }}
             >

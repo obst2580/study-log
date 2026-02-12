@@ -24,7 +24,7 @@ const GemWalletDisplay: React.FC<GemWalletProps> = ({ wallet, compact = false })
   }
 
   return (
-    <Card size="small" title="보석 지갑">
+    <Card size="small" title="보석 지갑" style={{ background: '#F5F5F0', borderRadius: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-around' }}>
         {GEM_ORDER.map((gem) => (
           <div key={gem} style={{ textAlign: 'center' }}>

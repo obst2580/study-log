@@ -51,11 +51,11 @@ const RegisterForm: React.FC = () => {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '100vh',
-      background: 'var(--bg-color, #f5f5f5)',
+      background: 'linear-gradient(135deg, #E8D5F5 0%, #DBEAFE 100%)',
     }}>
-      <Card style={{ width: 450, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Card style={{ width: 450, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <Title level={2} style={{ marginBottom: 4 }}>StudyLog</Title>
+          <Title level={2} style={{ marginBottom: 4, fontSize: 32, fontWeight: 800 }}>StudyLog</Title>
           <Text type="secondary">새 계정을 만드세요</Text>
         </div>
 
@@ -65,7 +65,7 @@ const RegisterForm: React.FC = () => {
             label="이름"
             rules={[{ required: true, message: '이름을 입력하세요' }]}
           >
-            <Input prefix={<UserOutlined />} placeholder="이름" size="large" />
+            <Input prefix={<UserOutlined />} placeholder="이름" size="large" style={{ borderRadius: 12 }} />
           </Form.Item>
 
           <Form.Item
@@ -76,7 +76,7 @@ const RegisterForm: React.FC = () => {
               { type: 'email', message: '올바른 이메일 형식이 아닙니다' },
             ]}
           >
-            <Input prefix={<MailOutlined />} placeholder="이메일" size="large" />
+            <Input prefix={<MailOutlined />} placeholder="이메일" size="large" style={{ borderRadius: 12 }} />
           </Form.Item>
 
           <Form.Item
@@ -87,7 +87,7 @@ const RegisterForm: React.FC = () => {
               { min: 4, message: '비밀번호는 4자 이상이어야 합니다' },
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="비밀번호" size="large" />
+            <Input.Password prefix={<LockOutlined />} placeholder="비밀번호" size="large" style={{ borderRadius: 12 }} />
           </Form.Item>
 
           <Form.Item name="grade" label="학년">
@@ -102,7 +102,7 @@ const RegisterForm: React.FC = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block size="large">
+            <Button type="primary" htmlType="submit" loading={loading} block size="large" style={{ borderRadius: 9999, background: '#7C3AED' }}>
               회원가입
             </Button>
           </Form.Item>

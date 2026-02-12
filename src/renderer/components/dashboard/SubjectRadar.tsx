@@ -40,8 +40,8 @@ const SubjectRadar: React.FC<SubjectRadarProps> = ({ mastery }) => {
         <Radar
           name="숙련도"
           dataKey="mastery"
-          stroke="#1890ff"
-          fill="#1890ff"
+          stroke="#7C3AED"
+          fill="rgba(124, 58, 237, 0.2)"
           fillOpacity={0.3}
         />
         <Tooltip formatter={(value: number) => [`${value}%`, '숙련도']} />

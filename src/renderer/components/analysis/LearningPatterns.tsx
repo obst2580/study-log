@@ -14,10 +14,10 @@ const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 function getHeatmapColor(minutes: number, max: number): string {
   if (minutes === 0) return '#f5f5f5';
   const ratio = max > 0 ? minutes / max : 0;
-  if (ratio < 0.25) return '#d6e4ff';
-  if (ratio < 0.5) return '#85a5ff';
-  if (ratio < 0.75) return '#2f54eb';
-  return '#10239e';
+  if (ratio < 0.25) return '#E8D5F5';
+  if (ratio < 0.5) return '#C4A6E8';
+  if (ratio < 0.75) return '#9B6FD4';
+  return '#7C3AED';
 }
 
 const LearningPatternsView: React.FC = () => {
@@ -78,9 +78,9 @@ const LearningPatternsView: React.FC = () => {
       <h2 style={{ marginBottom: 16 }}>학습 패턴</h2>
 
       {patterns.optimalStudyTime && (
-        <Card size="small" style={{ marginBottom: 16, background: '#f6ffed', borderColor: '#b7eb8f' }}>
+        <Card size="small" style={{ marginBottom: 16, background: '#C8F7DC', borderColor: '#6DD4A0', borderRadius: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BulbOutlined style={{ fontSize: 18, color: '#52c41a' }} />
+            <BulbOutlined style={{ fontSize: 18, color: '#2D8B5F' }} />
             <span style={{ fontWeight: 500 }}>최적 학습 시간: </span>
             <Tag color="green">{patterns.optimalStudyTime}</Tag>
           </div>
@@ -101,7 +101,7 @@ const LearningPatternsView: React.FC = () => {
                       name === 'minutes' ? [`${value}분`, '학습 시간'] : [`${value}회`, '세션']
                     }
                   />
-                  <Bar dataKey="minutes" fill="#1677ff" name="minutes" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="minutes" fill="#7C3AED" name="minutes" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -122,7 +122,7 @@ const LearningPatternsView: React.FC = () => {
                       name === 'minutes' ? [`${value}분`, '학습 시간'] : [`${value}회`, '세션']
                     }
                   />
-                  <Bar dataKey="minutes" fill="#722ed1" name="minutes" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="minutes" fill="#A78BFA" name="minutes" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -180,7 +180,7 @@ const LearningPatternsView: React.FC = () => {
             </div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12, fontSize: 11 }}>
               <span>적음</span>
-              {['#f5f5f5', '#d6e4ff', '#85a5ff', '#2f54eb', '#10239e'].map((color, i) => (
+              {['#f5f5f5', '#E8D5F5', '#C4A6E8', '#9B6FD4', '#7C3AED'].map((color, i) => (
                 <div key={i} style={{ width: 16, height: 16, borderRadius: 3, background: color }} />
               ))}
               <span>많음</span>

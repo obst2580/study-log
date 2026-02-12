@@ -2,10 +2,10 @@ import React from 'react';
 import type { GemType } from '../../../shared/types';
 
 const GEM_COLORS: Record<GemType, string> = {
-  emerald: '#50C878',
-  sapphire: '#0F52BA',
-  ruby: '#E0115F',
-  diamond: '#B9F2FF',
+  emerald: '#6DD4A0',
+  sapphire: '#6B9AE8',
+  ruby: '#E86B8A',
+  diamond: '#C8E8FF',
 };
 
 const GEM_LABELS: Record<GemType, string> = {

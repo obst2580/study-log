@@ -138,9 +138,9 @@ export const FloatingTimer: React.FC = () => {
     : formatTime(pomodoroRemainingSeconds);
 
   const phaseColors: Record<string, string> = {
-    focus: '#1890ff',
-    shortBreak: '#52c41a',
-    longBreak: '#faad14',
+    focus: '#7C3AED',
+    shortBreak: '#10B981',
+    longBreak: '#D97706',
   };
 
   const activeTopic = activeTopicId
@@ -148,8 +148,8 @@ export const FloatingTimer: React.FC = () => {
     : null;
 
   const accentColor = timerType === 'pomodoro'
-    ? phaseColors[pomodoroPhase] ?? '#1890ff'
-    : '#1890ff';
+    ? phaseColors[pomodoroPhase] ?? '#7C3AED'
+    : '#7C3AED';
 
   return (
     <div
@@ -210,8 +210,8 @@ export const FloatingTimer: React.FC = () => {
         type="text"
         size="small"
         icon={isRunning
-          ? <span style={{ fontSize: 10, color: '#52c41a' }}>||</span>
-          : <span style={{ fontSize: 10, color: '#faad14' }}>&#9654;</span>
+          ? <span style={{ fontSize: 10, color: '#10B981' }}>||</span>
+          : <span style={{ fontSize: 10, color: '#D97706' }}>&#9654;</span>
         }
         onClick={(e) => {
           e.stopPropagation();
