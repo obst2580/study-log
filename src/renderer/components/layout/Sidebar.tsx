@@ -19,6 +19,7 @@ import {
   FlagOutlined,
   LineChartOutlined,
   GoldOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
 import { useAppStore } from '../../stores/appStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -59,6 +60,8 @@ const Sidebar: React.FC = () => {
   };
 
   const viewItems = [
+    // 홈
+    { key: '/', icon: <HomeOutlined />, label: '홈' },
     // 학습 (Study) - always expanded
     { key: '/kanban', icon: <AppstoreOutlined />, label: '칸반 보드' },
     { key: '/curriculum', icon: <BookOutlined />, label: '커리큘럼 관리' },
@@ -113,6 +116,7 @@ const Sidebar: React.FC = () => {
 
   if (sidebarCollapsed) {
     const studyItems = [
+      { key: '/', icon: <HomeOutlined />, label: '홈' },
       { key: '/kanban', icon: <AppstoreOutlined />, label: '칸반 보드' },
       { key: '/curriculum', icon: <BookOutlined />, label: '커리큘럼 관리' },
       { key: '/timer', icon: <ClockCircleOutlined />, label: '타이머' },
@@ -198,7 +202,7 @@ const Sidebar: React.FC = () => {
     >
       <Menu
         mode="inline"
-        selectedKeys={[location.pathname === '/' ? '/kanban' : location.pathname]}
+        selectedKeys={[location.pathname]}
         items={viewItems}
         onClick={({ key }) => navigate(key)}
         style={{ borderRight: 0 }}

@@ -7,6 +7,8 @@ export const SCORE_TO_INTERVAL_DAYS: Record<number, number> = {
 };
 
 export const MASTERY_THRESHOLD = 3;
+export const MASTERY_MIN_REVIEWS = 5;
+export const MASTERY_AVG_THRESHOLD = 4.5;
 export const DEFAULT_DAILY_LIMIT = 10;
 export const MS_PER_DAY = 86400000;
 

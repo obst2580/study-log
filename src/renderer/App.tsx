@@ -17,6 +17,7 @@ import ChallengeListView from './components/challenge/ChallengeList';
 import LearningPatternsView from './components/analysis/LearningPatterns';
 import CurriculumBrowser from './components/curriculum/CurriculumBrowser';
 import SplendorDashboard from './components/splendor/SplendorDashboard';
+import HomePage from './components/home/HomePage';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import { useAppStore } from './stores/appStore';
@@ -77,7 +78,7 @@ const App: React.FC = () => {
     >
       <AppLayout>
         <Routes>
-          <Route path="/" element={<KanbanBoard />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/kanban" element={<KanbanBoard />} />
           <Route path="/curriculum" element={<CurriculumBrowser />} />
           <Route path="/dashboard" element={<Dashboard />} />

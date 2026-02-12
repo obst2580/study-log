@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getPool } from '../database/index.js';
 import { mapReviewEntry, mapTopicWithJoins, mapTopic } from '../database/mappers.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { SCORE_TO_INTERVAL_DAYS, MASTERY_THRESHOLD, MS_PER_DAY } from '../utils/constants.js';
+import { SCORE_TO_INTERVAL_DAYS, MASTERY_THRESHOLD, MASTERY_MIN_REVIEWS, MASTERY_AVG_THRESHOLD, MS_PER_DAY } from '../utils/constants.js';
 import { earnGems } from '../services/gemEngine.js';
 
 const router = Router();
@@ -108,8 +108,23 @@ router.post('/', asyncHandler(async (req, res) => {
     }
     const topic = topicQuery.rows[0];
 
-    const newMasteryCount = understandingScore === 5 ? ((topic.mastery_count as number) + 1) : 0;
-    const targetColumn = newMasteryCount >= MASTERY_THRESHOLD ? 'mastered' : 'reviewing';
+    // Fetch recent reviews (excluding current) for mastery check
+    const recentReviews = await client.query(
+      `SELECT understanding_score FROM review_entries
+       WHERE topic_id = $1 AND user_id = $2 AND understanding_score IS NOT NULL
+       ORDER BY reviewed_at DESC LIMIT $3`,
+      [topicId, req.userId, MASTERY_MIN_REVIEWS - 1]
+    );
+
+    const scores = [understandingScore, ...recentReviews.rows.map((r: { understanding_score: number }) => r.understanding_score)];
+    const totalReviews = scores.length;
+    const avgScore = scores.reduce((a: number, b: number) => a + b, 0) / totalReviews;
+
+    const mastered = totalReviews >= MASTERY_MIN_REVIEWS && avgScore >= MASTERY_AVG_THRESHOLD;
+    const targetColumn = mastered ? 'mastered' : 'reviewing';
+
+    // mastery_count kept for UI reference (consecutive high-score streak)
+    const newMasteryCount = understandingScore >= 4 ? ((topic.mastery_count as number) + 1) : 0;
     const finalNextReview = targetColumn === 'mastered' ? null : nextReviewAt;
 
     const id = uuidv4();
