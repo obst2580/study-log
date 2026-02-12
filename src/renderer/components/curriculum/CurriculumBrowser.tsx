@@ -28,7 +28,7 @@ const { Panel } = Collapse;
 const STATUS_TAG_CONFIG: Record<string, { label: string; color: string }> = {
   backlog: { label: '백로그', color: 'default' },
   today: { label: '오늘', color: 'orange' },
-  reviewing: { label: '복습중', color: 'blue' },
+  reviewing: { label: '복습중', color: 'purple' },
   mastered: { label: '마스터', color: 'green' },
 };
 
@@ -190,7 +190,7 @@ const CurriculumBrowser: React.FC = () => {
       {/* Search */}
       <Input
         placeholder="주제 검색..."
-        prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+        prefix={<SearchOutlined style={{ color: 'var(--text-muted)' }} />}
         allowClear
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
@@ -229,7 +229,7 @@ const CurriculumBrowser: React.FC = () => {
         >
           마스터 <strong>{totalStats.mastered}</strong>
         </Tag>
-        <span style={{ fontSize: 12, color: '#999', display: 'flex', alignItems: 'center' }}>
+        <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
           전체 {totalStats.total}개
         </span>
       </div>
@@ -267,7 +267,7 @@ const CurriculumBrowser: React.FC = () => {
                       <span style={{ fontWeight: 600, fontSize: 14, flex: 1 }}>
                         {subject.name}
                       </span>
-                      <span style={{ fontSize: 12, color: '#666', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                         마스터 {subject.masteredCount}/{subjectTotal}
                       </span>
                       <Progress
@@ -293,8 +293,8 @@ const CurriculumBrowser: React.FC = () => {
                         style={{
                           fontWeight: 600,
                           fontSize: 13,
-                          color: '#555',
-                          borderBottom: '1px solid #f0f0f0',
+                          color: 'var(--text-secondary)',
+                          borderBottom: '1px solid var(--border-color)',
                           paddingBottom: 6,
                           marginBottom: 8,
                           display: 'flex',
@@ -303,7 +303,7 @@ const CurriculumBrowser: React.FC = () => {
                         }}
                       >
                         <span>{unit.name}</span>
-                        <span style={{ fontWeight: 400, fontSize: 11, color: '#999' }}>
+                        <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--text-muted)' }}>
                           {unit.masteredCount}/{unit.totalCount}
                         </span>
                       </div>

@@ -83,7 +83,7 @@ const StudyTimer: React.FC = () => {
       <div style={{ marginBottom: 12 }}>
         <label
           htmlFor="timer-topic-select"
-          style={{ display: 'block', marginBottom: 4, fontSize: 12, color: '#999' }}
+          style={{ display: 'block', marginBottom: 4, fontSize: 12, color: 'var(--text-muted)' }}
         >
           학습할 카드
         </label>

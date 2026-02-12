@@ -45,7 +45,7 @@ const GemIcon: React.FC<GemIconProps> = ({ type, size = 16, count, showLabel = f
         </span>
       )}
       {showLabel && (
-        <span style={{ fontSize: size * 0.75, color: '#666' }}>
+        <span style={{ fontSize: size * 0.75, color: 'var(--text-secondary)' }}>
           {GEM_LABELS[type]}
         </span>
       )}

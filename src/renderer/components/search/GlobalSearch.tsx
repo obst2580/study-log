@@ -55,7 +55,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose, onSelectTopi
         groups.set(key, {
           subjectId: key,
           subjectName: subjectInfo?.name ?? '기타',
-          subjectColor: subjectInfo?.color ?? '#999',
+          subjectColor: subjectInfo?.color ?? 'var(--text-muted)',
           topics: [],
         });
       }
@@ -199,7 +199,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose, onSelectTopi
         aria-label="검색 결과"
       >
         {query.trim() === '' ? (
-          <div style={{ padding: 32, textAlign: 'center', color: '#999' }}>
+          <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>
             <SearchOutlined style={{ fontSize: 24, marginBottom: 8, display: 'block', opacity: 0.3 }} />
             검색어를 입력하세요
           </div>
@@ -302,7 +302,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose, onSelectTopi
           padding: '8px 16px',
           borderTop: '1px solid var(--border-color, #f0f0f0)',
           fontSize: 11,
-          color: '#999',
+          color: 'var(--text-muted)',
           display: 'flex',
           gap: 16,
         }}

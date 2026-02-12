@@ -141,7 +141,7 @@ const LearningPatternsView: React.FC = () => {
                   <tr>
                     <th style={{ padding: 4, fontSize: 11 }}></th>
                     {HOURS.filter((h) => h % 2 === 0).map((h) => (
-                      <th key={h} style={{ padding: 4, fontSize: 10, color: '#999' }} colSpan={2}>
+                      <th key={h} style={{ padding: 4, fontSize: 10, color: 'var(--text-muted)' }} colSpan={2}>
                         {h}시
                       </th>
                     ))}

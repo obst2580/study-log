@@ -167,7 +167,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ topicId, onClose, onEdit }) => 
                 style={{
                   marginTop: 4,
                   padding: 12,
-                  borderRadius: 6,
+                  borderRadius: 12,
                   fontSize: 14,
                 }}
               >
@@ -222,7 +222,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ topicId, onClose, onEdit }) => 
                         {COLUMN_LABELS[r.fromColumn]}
                       </Tag>
                       {' '}
-                      <span style={{ color: '#999' }}>&#8594;</span>
+                      <span style={{ color: 'var(--text-muted)' }}>&#8594;</span>
                       {' '}
                       <Tag
                         color={COLUMN_COLORS[r.toColumn]}
@@ -265,7 +265,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ topicId, onClose, onEdit }) => 
             </div>
           )}
 
-          <div style={{ fontSize: 11, color: '#999', textAlign: 'right', marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'right', marginTop: 8 }}>
             생성: {dayjs(topic.createdAt).format('YYYY-MM-DD')} | 수정: {dayjs(topic.updatedAt).format('YYYY-MM-DD')}
           </div>
         </div>

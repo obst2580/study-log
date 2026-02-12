@@ -150,10 +150,10 @@ export const CardPreview: React.FC<CardPreviewProps> = ({ cards, onAddCards, add
                 ))}
               </div>
               {card.checklist.length > 0 && (
-                <div style={{ marginTop: 4, fontSize: 11, color: '#666' }}>
+                <div style={{ marginTop: 4, fontSize: 11, color: 'var(--text-secondary)' }}>
                   {card.checklist.map((item, i) => (
                     <div key={i} style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                      <span style={{ color: '#ccc' }}>&#9744;</span>
+                      <span style={{ color: 'var(--text-muted)' }}>&#9744;</span>
                       <span>{item}</span>
                     </div>
                   ))}

@@ -80,8 +80,7 @@ const CalendarView: React.FC = () => {
 
       <Card
         title={`${selectedDate} 일정`}
-        size="small"
-        style={{ width: 300, flexShrink: 0, overflow: 'auto' }}
+        style={{ width: 300, flexShrink: 0, overflow: 'auto', borderRadius: 16 }}
       >
         {selectedExams.length > 0 && (
           <div style={{ marginBottom: 12 }}>

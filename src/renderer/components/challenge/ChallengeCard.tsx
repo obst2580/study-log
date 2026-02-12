@@ -38,14 +38,14 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, profileNames }
       }
       extra={
         isActive ? (
-          <Tag color="blue">D-{daysLeft}</Tag>
+          <Tag color="purple">D-{daysLeft}</Tag>
         ) : (
           <Tag color="default">종료</Tag>
         )
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ fontSize: 12, color: '#999' }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
           목표: {challenge.targetValue}{config.unit} | {config.label}
         </div>
 
@@ -56,7 +56,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, profileNames }
             <div key={p.userId}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span style={{ fontSize: 13, fontWeight: 500 }}>{name}</span>
-                <span style={{ fontSize: 12, color: '#999' }}>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                   {p.currentValue}/{challenge.targetValue}{config.unit}
                 </span>
               </div>

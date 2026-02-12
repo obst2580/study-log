@@ -15,7 +15,7 @@ import type { ChildSummary, WeeklyActivity } from '../../../shared/types';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-const ACTIVITY_COLORS = ['#f0f0f0', '#E8D5F5', '#C4A6E8', '#9B6FD4', '#7C3AED'];
+const ACTIVITY_COLORS = ['#F5F5F0', '#E8D5F5', '#C4A6E8', '#9B6FD4', '#7C3AED'];
 
 function getActivityColor(minutes: number): string {
   if (minutes === 0) return ACTIVITY_COLORS[0];
@@ -149,7 +149,7 @@ const ChildTab: React.FC<ChildTabProps> = ({ userId }) => {
                   const dayOfWeek = WEEKDAYS[new Date(day.date).getDay()];
                   return (
                     <div key={day.date} style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 11, color: '#999', marginBottom: 4 }}>{dayOfWeek}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{dayOfWeek}</div>
                       <div
                         style={{
                           width: 40,
@@ -161,13 +161,13 @@ const ChildTab: React.FC<ChildTabProps> = ({ userId }) => {
                           justifyContent: 'center',
                           fontSize: 11,
                           fontWeight: 500,
-                          color: day.studyMinutes >= 60 ? '#fff' : '#333',
+                          color: day.studyMinutes >= 60 ? '#fff' : 'var(--text-primary)',
                         }}
                         title={`${day.date}: ${formatMinutes(day.studyMinutes)}`}
                       >
                         {day.studyMinutes > 0 ? `${day.studyMinutes}m` : '-'}
                       </div>
-                      <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
                         {day.reviewCount > 0 ? `${day.reviewCount}R` : ''}
                       </div>
                     </div>

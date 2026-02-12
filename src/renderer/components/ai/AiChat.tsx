@@ -260,12 +260,12 @@ const AiChat: React.FC = () => {
         aria-live="polite"
       >
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '32px 16px', color: '#999' }}>
+          <div style={{ textAlign: 'center', padding: '32px 16px', color: 'var(--text-muted)' }}>
             <RobotOutlined style={{ fontSize: 32, marginBottom: 12, display: 'block', opacity: 0.3 }} />
             <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
               AI 학습 도우미에게 질문하세요
             </Text>
-            <div style={{ fontSize: 12, color: '#bbb', lineHeight: 1.8 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.8 }}>
               <div>예: &quot;수학 이차방정식 단원 카드 만들어줘&quot;</div>
               <div>예: &quot;영어 현재완료 문법 체크리스트 만들어줘&quot;</div>
               <div>예: &quot;과학 광합성 핵심 개념 정리해줘&quot;</div>

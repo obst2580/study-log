@@ -47,10 +47,10 @@ const RewardToast: React.FC<RewardToastProps> = ({ reward, onDone }) => {
         zIndex: 1050,
         background: reward.mastered ? 'var(--brand-success)' : 'var(--brand-primary)',
         color: '#fff',
-        borderRadius: 16,
+        borderRadius: 20,
         padding: '16px 24px',
         minWidth: 240,
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.18)',
       }}
     >
       {reward.mastered && (

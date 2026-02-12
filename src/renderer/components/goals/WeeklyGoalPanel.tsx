@@ -126,7 +126,7 @@ const WeeklyGoalPanel: React.FC = () => {
                 <Checkbox
                   checked={item.completed}
                   onChange={() => handleToggleGoal(item.id)}
-                  style={{ textDecoration: item.completed ? 'line-through' : 'none', color: item.completed ? '#999' : 'inherit' }}
+                  style={{ textDecoration: item.completed ? 'line-through' : 'none', color: item.completed ? 'var(--text-muted)' : 'inherit' }}
                 >
                   {item.text}
                 </Checkbox>
@@ -162,7 +162,7 @@ const WeeklyGoalPanel: React.FC = () => {
               <div style={{ width: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                   <span style={{ fontWeight: 500 }}>{week.weekStart}</span>
-                  <span style={{ color: '#999' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>
                     {week.goals.filter((g) => g.completed).length}/{week.goals.length}
                   </span>
                 </div>

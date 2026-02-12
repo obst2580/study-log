@@ -42,13 +42,13 @@ const AchievementList: React.FC = () => {
     <div style={{ maxWidth: 800 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ margin: 0 }}>
-          업적 <span style={{ fontSize: 14, color: '#999', fontWeight: 400 }}>({unlockedCount}/{achievements.length})</span>
+          업적 <span style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 400 }}>({unlockedCount}/{achievements.length})</span>
         </h2>
         <Space>
           {(['all', 'unlocked', 'locked'] as FilterType[]).map((f) => (
             <Tag
               key={f}
-              color={filter === f ? 'blue' : undefined}
+              color={filter === f ? 'purple' : undefined}
               onClick={() => setFilter(f)}
               style={{ cursor: 'pointer' }}
             >
@@ -58,7 +58,7 @@ const AchievementList: React.FC = () => {
         </Space>
       </div>
 
-      <Card size="small">
+      <Card style={{ borderRadius: 16 }}>
         {filtered.length === 0 ? (
           <Empty description="업적이 없습니다" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (

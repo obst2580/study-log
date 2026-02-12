@@ -126,8 +126,7 @@ const SettingsView: React.FC = () => {
               <span>테마</span>
             </Space>
           }
-          size="small"
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, borderRadius: 16 }}
         >
           <Form.Item label="테마 모드">
             <Switch
@@ -149,8 +148,7 @@ const SettingsView: React.FC = () => {
               <span>타이머 설정</span>
             </Space>
           }
-          size="small"
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, borderRadius: 16 }}
         >
           <Space size="large" wrap>
             <Form.Item name="pomodoroFocus" label="집중 시간 (분)">
@@ -176,8 +174,7 @@ const SettingsView: React.FC = () => {
 
         <Card
           title={<Space><BookOutlined /><span>커리큘럼 관리</span></Space>}
-          size="small"
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, borderRadius: 16 }}
         >
           <Space direction="vertical" style={{ width: '100%' }}>
             <Select
@@ -213,8 +210,7 @@ const SettingsView: React.FC = () => {
               <span>데이터 관리</span>
             </Space>
           }
-          size="small"
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, borderRadius: 16 }}
         >
           <Space>
             <Button onClick={handleExport}>JSON 내보내기</Button>

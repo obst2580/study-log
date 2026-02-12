@@ -138,7 +138,7 @@ const WeeklyReflectionForm: React.FC = () => {
                 <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>기분</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <Rate value={mood} onChange={setMood} tooltips={Object.values(MOOD_LABELS)} />
-                  <span style={{ color: '#666', fontSize: 13 }}>{MOOD_LABELS[mood]}</span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>{MOOD_LABELS[mood]}</span>
                 </div>
               </div>
 

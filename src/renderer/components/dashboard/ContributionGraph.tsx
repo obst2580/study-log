@@ -87,7 +87,7 @@ const ContributionGraph: React.FC = () => {
         )}
       </svg>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, fontSize: 11, color: '#999' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, fontSize: 11, color: 'var(--text-muted)' }}>
         <span>적음</span>
         {INTENSITY_COLORS.map((color, i) => (
           <div

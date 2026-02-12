@@ -80,7 +80,7 @@ const Checklist: React.FC<ChecklistProps> = ({ topicId, items, onUpdate }) => {
               onChange={() => handleToggle(item)}
               style={{
                 textDecoration: item.checked ? 'line-through' : 'none',
-                color: item.checked ? '#999' : undefined,
+                color: item.checked ? 'var(--text-muted)' : undefined,
               }}
               aria-label={`${item.text} ${item.checked ? '완료됨' : '미완료'}`}
             >

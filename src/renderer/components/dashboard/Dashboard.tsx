@@ -160,7 +160,7 @@ const Dashboard: React.FC = () => {
                       <span style={{ fontSize: 20 }}>{item.icon}</span>
                       <div>
                         <div style={{ fontWeight: 500, fontSize: 13 }}>{item.title}</div>
-                        <div style={{ fontSize: 11, color: '#999' }}>{item.description}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.description}</div>
                       </div>
                     </div>
                   </List.Item>
@@ -188,7 +188,7 @@ const Dashboard: React.FC = () => {
                           <span style={{ fontWeight: 500, fontSize: 13 }}>{challenge.title}</span>
                           <Tag color="blue">D-{daysLeft}</Tag>
                         </div>
-                        <div style={{ fontSize: 12, color: '#999', marginTop: 2 }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                           참가자 {challenge.participants.length}명 | 목표: {challenge.targetValue}
                         </div>
                       </div>

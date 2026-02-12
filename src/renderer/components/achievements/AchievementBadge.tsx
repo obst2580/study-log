@@ -15,7 +15,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement }) => {
       <div style={{ fontWeight: 600 }}>{title}</div>
       <div style={{ fontSize: 12 }}>{description}</div>
       {unlocked && unlockedAt && (
-        <div style={{ fontSize: 11, marginTop: 4, color: '#aaa' }}>
+        <div style={{ fontSize: 11, marginTop: 4, color: 'var(--text-muted)' }}>
           {new Date(unlockedAt).toLocaleDateString('ko-KR')} 달성
         </div>
       )}
@@ -33,10 +33,10 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement }) => {
         width: 100,
         textAlign: 'center',
         padding: 12,
-        borderRadius: 8,
+        borderRadius: 16,
         border: '1px solid',
-        borderColor: unlocked ? '#d9d9d9' : '#f0f0f0',
-        background: unlocked ? '#fff' : '#fafafa',
+        borderColor: unlocked ? 'var(--border-strong)' : 'var(--border-color)',
+        background: unlocked ? 'var(--pastel-lavender)' : 'var(--bg-secondary)',
         opacity: unlocked ? 1 : 0.6,
         cursor: 'default',
         transition: 'all 0.2s',
@@ -51,7 +51,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement }) => {
         <div style={{
           fontSize: 12,
           fontWeight: 500,
-          color: unlocked ? '#333' : '#999',
+          color: unlocked ? 'var(--text-primary)' : 'var(--text-muted)',
           marginBottom: 4,
           lineHeight: 1.3,
         }}>
@@ -62,7 +62,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement }) => {
             percent={progressPercent}
             size="small"
             showInfo={false}
-            strokeColor="#bbb"
+            strokeColor="var(--brand-primary-light)"
           />
         )}
       </div>

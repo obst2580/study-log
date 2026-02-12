@@ -89,7 +89,7 @@ const CardPurchaseModal: React.FC<CardPurchaseModalProps> = ({ topicId, open, on
                     <div style={{ marginTop: 4 }}>
                       {disc > 0 ? (
                         <>
-                          <span style={{ textDecoration: 'line-through', color: '#999', marginRight: 4 }}>{base}</span>
+                          <span style={{ textDecoration: 'line-through', color: 'var(--text-muted)', marginRight: 4 }}>{base}</span>
                           <span style={{ fontWeight: 700, color: '#52c41a' }}>{effective}</span>
                         </>
                       ) : (

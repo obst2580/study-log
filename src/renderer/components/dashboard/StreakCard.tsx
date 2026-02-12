@@ -10,7 +10,7 @@ interface StreakCardProps {
 }
 
 const StreakCard: React.FC<StreakCardProps> = ({ currentStreak, longestStreak }) => {
-  const streakColor = currentStreak >= 7 ? '#fa8c16' : currentStreak >= 3 ? '#fadb14' : '#d9d9d9';
+  const streakColor = currentStreak >= 7 ? '#fa8c16' : currentStreak >= 3 ? '#fadb14' : 'var(--border-color)';
 
   return (
     <Card size="small" style={{ background: 'var(--pastel-yellow)', borderRadius: 20, border: 'none' }}>

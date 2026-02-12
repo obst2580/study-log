@@ -42,7 +42,7 @@ const NobleProgressDisplay: React.FC<NobleProgressProps> = ({ nobles }) => {
                 </Tag>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 12, color: '#666' }}>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                   {noble.masteredTopics}/{noble.totalTopics}
                 </div>
                 {noble.completed && (

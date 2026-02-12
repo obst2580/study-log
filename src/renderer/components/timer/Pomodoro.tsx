@@ -86,7 +86,7 @@ const Pomodoro: React.FC = () => {
             ? PHASE_COLORS.focus
             : isCurrent
               ? PHASE_COLORS[pomodoroPhase]
-              : '#d9d9d9',
+              : 'var(--border-color)',
           margin: '0 3px',
           transition: 'all 0.3s ease',
           boxShadow: isCurrent ? `0 0 6px ${PHASE_COLORS[pomodoroPhase]}` : 'none',

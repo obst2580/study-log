@@ -111,7 +111,7 @@ const TimelineView: React.FC = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <div style={{ fontWeight: 500, fontSize: 14 }}>{event.title}</div>
-                    <div style={{ fontSize: 13, color: '#666' }}>{event.description}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{event.description}</div>
                   </div>
                   <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
                     {dayjs(event.timestamp).format('MM-DD HH:mm')}

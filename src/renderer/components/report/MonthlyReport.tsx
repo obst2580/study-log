@@ -102,7 +102,7 @@ const MonthlyReportView: React.FC = () => {
                     ) : (
                       <span style={{ color: '#ff4d4f' }}><ArrowDownOutlined /> {formatMinutes(Math.abs(growth.studyTimeDelta))}</span>
                     )}
-                    <span style={{ color: '#999' }}> vs 전월</span>
+                    <span style={{ color: 'var(--text-muted)' }}> vs 전월</span>
                   </div>
                 )}
               </Card>
@@ -122,7 +122,7 @@ const MonthlyReportView: React.FC = () => {
                     ) : (
                       <span style={{ color: '#ff4d4f' }}><ArrowDownOutlined /> {growth.reviewCountDelta}</span>
                     )}
-                    <span style={{ color: '#999' }}> vs 전월</span>
+                    <span style={{ color: 'var(--text-muted)' }}> vs 전월</span>
                   </div>
                 )}
               </Card>
@@ -142,7 +142,7 @@ const MonthlyReportView: React.FC = () => {
                     ) : (
                       <span style={{ color: '#ff4d4f' }}><ArrowDownOutlined /> {growth.understandingDelta.toFixed(1)}</span>
                     )}
-                    <span style={{ color: '#999' }}> vs 전월</span>
+                    <span style={{ color: 'var(--text-muted)' }}> vs 전월</span>
                   </div>
                 )}
               </Card>

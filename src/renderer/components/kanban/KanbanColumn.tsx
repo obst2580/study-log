@@ -102,7 +102,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             style={{
               textAlign: 'center',
               padding: '24px 8px',
-              color: '#999',
+              color: 'var(--text-muted)',
               fontSize: 13,
             }}
             aria-label="빈 컬럼"

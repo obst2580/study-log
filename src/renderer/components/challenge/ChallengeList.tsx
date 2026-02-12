@@ -72,7 +72,7 @@ const ChallengeListView: React.FC = () => {
 
       {activeChallenges.length > 0 && (
         <>
-          <h3 style={{ fontSize: 14, color: '#666', marginBottom: 12 }}>진행 중</h3>
+          <h3 style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 12 }}>진행 중</h3>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
             {activeChallenges.map((c) => (
               <Col key={c.id} xs={24} sm={12} lg={8}>
@@ -85,7 +85,7 @@ const ChallengeListView: React.FC = () => {
 
       {completedChallenges.length > 0 && (
         <>
-          <h3 style={{ fontSize: 14, color: '#666', marginBottom: 12 }}>완료된 챌린지</h3>
+          <h3 style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 12 }}>완료된 챌린지</h3>
           <Row gutter={[16, 16]}>
             {completedChallenges.map((c) => (
               <Col key={c.id} xs={24} sm={12} lg={8}>

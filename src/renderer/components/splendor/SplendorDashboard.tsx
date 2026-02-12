@@ -72,7 +72,7 @@ const SplendorDashboard: React.FC = () => {
         <Col xs={24} lg={14}>
           <Card title="구매 가능한 카드" size="small">
             {purchasableTopics.length === 0 ? (
-              <div style={{ color: '#999', textAlign: 'center', padding: 16 }}>
+              <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>
                 구매 가능한 카드가 없습니다
               </div>
             ) : (
@@ -134,11 +134,11 @@ const SplendorDashboard: React.FC = () => {
                     }}>
                       {tx.amount > 0 ? '+' : ''}{tx.amount}
                     </span>
-                    <span style={{ color: '#666', fontSize: 12 }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>
                       {REASON_LABELS[tx.reason] || tx.reason}
                     </span>
                   </div>
-                  <span style={{ fontSize: 11, color: '#999' }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                     {new Date(tx.createdAt).toLocaleDateString()}
                   </span>
                 </List.Item>
