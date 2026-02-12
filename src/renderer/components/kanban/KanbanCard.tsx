@@ -2,10 +2,13 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Tag, Button, Tooltip, Progress } from 'antd';
-import { CheckOutlined, CheckSquareOutlined } from '@ant-design/icons';
+import { CheckOutlined, CheckSquareOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { DIFFICULTY_LABELS, DIFFICULTY_COLORS, IMPORTANCE_LABELS, IMPORTANCE_COLORS } from '../../utils/constants';
 import { formatReviewDate } from '../../utils/spaced-repetition';
-import type { Topic } from '../../types';
+import { useTimerStore } from '../../stores/timerStore';
+import GemIcon from '../splendor/GemIcon';
+import type { Topic, GemType } from '../../types';
 
 interface KanbanCardProps {
   topic: Topic;
@@ -24,6 +27,8 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
   onClick,
   onComplete,
 }) => {
+  const navigate = useNavigate();
+  const setActiveTopic = useTimerStore((s) => s.setActiveTopic);
   const {
     attributes,
     listeners,
@@ -36,7 +41,13 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    borderLeft: subjectColor ? `3px solid ${subjectColor}` : undefined,
+    borderLeft: subjectColor ? `4px solid ${subjectColor}` : undefined,
+  };
+
+  const handleStartStudy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveTopic(topic.id);
+    navigate('/timer');
   };
 
   const reviewDateText = formatReviewDate(topic.nextReviewAt);
@@ -109,20 +120,31 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
               </Tag>
             ))}
             {topic.tags.length > 3 && (
-              <span style={{ fontSize: 10, color: '#999' }}>+{topic.tags.length - 3}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>+{topic.tags.length - 3}</span>
             )}
           </div>
         )}
 
+        {/* Gem cost badges */}
+        {topic.gemCost && !topic.purchased && topic.column !== 'mastered' && (
+          <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
+            {(['emerald', 'sapphire', 'ruby', 'diamond'] as GemType[]).map((gem) => {
+              const cost = topic.gemCost[gem];
+              if (cost === 0) return null;
+              return <GemIcon key={gem} type={gem} size={12} count={cost} />;
+            })}
+          </div>
+        )}
+
         {reviewDateText && (
-          <div style={{ marginTop: 4, fontSize: 11, color: '#999' }}>
+          <div style={{ marginTop: 4, fontSize: 11, color: 'var(--text-muted)' }}>
             {reviewDateText}
           </div>
         )}
 
         {/* Study time indicator */}
         {topic.studyTimeTotal > 0 && (
-          <div style={{ marginTop: 4, fontSize: 10, color: '#bbb' }}>
+          <div style={{ marginTop: 4, fontSize: 10, color: 'var(--text-muted)' }}>
             {topic.studyTimeTotal >= 3600
               ? `${Math.floor(topic.studyTimeTotal / 3600)}h ${Math.floor((topic.studyTimeTotal % 3600) / 60)}m`
               : topic.studyTimeTotal >= 60
@@ -134,13 +156,25 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
       </div>
 
       {topic.column !== 'mastered' && (
-        <div style={{ marginTop: 6, display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Tooltip title="타이머로 공부 시작">
+            <Button
+              type="text"
+              size="small"
+              icon={<PlayCircleOutlined />}
+              style={{ color: 'var(--brand-primary)', fontWeight: 600, fontSize: 12 }}
+              aria-label={`${topic.title} 공부 시작`}
+              onClick={handleStartStudy}
+            >
+              공부 시작
+            </Button>
+          </Tooltip>
           <Tooltip title="학습 완료 (다음 단계로 이동)">
             <Button
               type="text"
               size="small"
               icon={<CheckOutlined />}
-              style={{ color: '#52c41a' }}
+              style={{ color: 'var(--brand-success)' }}
               aria-label={`${topic.title} 학습 완료`}
               onClick={(e) => {
                 e.stopPropagation();

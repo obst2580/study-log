@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -25,6 +25,8 @@ import KanbanCard from './KanbanCard';
 import CardDetail from '../card/CardDetail';
 import CardForm from '../card/CardForm';
 import SelfEvalModal from '../review/SelfEvalModal';
+import RewardToast from '../feedback/RewardToast';
+import Confetti from '../feedback/Confetti';
 import { useKanbanStore } from '../../stores/kanbanStore';
 import { useAppStore } from '../../stores/appStore';
 import { apiService } from '../../api/apiService';
@@ -35,24 +37,32 @@ import type { CurriculumProgress } from '../../../shared/types';
 
 const STATUS_CARD_STYLES = {
   backlog: {
-    background: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
-    iconColor: '#8c8c8c',
-    borderColor: '#d9d9d9',
+    background: 'var(--status-backlog-bg)',
+    iconColor: 'var(--status-backlog-icon)',
+    borderColor: 'var(--status-backlog-border)',
+    textColor: 'var(--text-secondary)',
+    valueColor: 'var(--text-secondary)',
   },
   today: {
-    background: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)',
-    iconColor: '#1890ff',
-    borderColor: '#91d5ff',
+    background: 'var(--status-today-bg)',
+    iconColor: 'var(--status-today-icon)',
+    borderColor: 'var(--status-today-border)',
+    textColor: '#4338CA',
+    valueColor: 'var(--brand-primary)',
   },
   reviewing: {
-    background: 'linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%)',
-    iconColor: '#722ed1',
-    borderColor: '#d3adf7',
+    background: 'var(--status-reviewing-bg)',
+    iconColor: 'var(--status-reviewing-icon)',
+    borderColor: 'var(--status-reviewing-border)',
+    textColor: '#BE123C',
+    valueColor: 'var(--brand-danger)',
   },
   mastered: {
-    background: 'linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%)',
-    iconColor: '#52c41a',
-    borderColor: '#b7eb8f',
+    background: 'var(--status-mastered-bg)',
+    iconColor: 'var(--status-mastered-icon)',
+    borderColor: 'var(--status-mastered-border)',
+    textColor: '#065F46',
+    valueColor: 'var(--brand-success)',
   },
 } as const;
 
@@ -66,7 +76,22 @@ const KanbanBoard: React.FC = () => {
     topics, completedToday, dailyProgress, loading,
     loadTopics, loadCompletedToday, loadDailyProgress,
     moveTopic, completeTopic, selfEval, closeSelfEval, submitSelfEval,
+    lastReward, clearReward,
   } = useKanbanStore();
+
+  const [showConfetti, setShowConfetti] = useState(false);
+  const handleRewardDone = useCallback(() => {
+    clearReward();
+  }, [clearReward]);
+  const handleConfettiDone = useCallback(() => {
+    setShowConfetti(false);
+  }, []);
+
+  useEffect(() => {
+    if (lastReward?.mastered) {
+      setShowConfetti(true);
+    }
+  }, [lastReward]);
 
   const [activeCard, setActiveCard] = useState<Topic | null>(null);
   const [detailTopicId, setDetailTopicId] = useState<string | null>(null);
@@ -167,7 +192,7 @@ const KanbanBoard: React.FC = () => {
             style={{
               background: STATUS_CARD_STYLES.backlog.background,
               border: `1px solid ${STATUS_CARD_STYLES.backlog.borderColor}`,
-              borderRadius: 10,
+              borderRadius: 12,
               cursor: 'pointer',
             }}
             styles={{ body: { padding: '12px 16px' } }}
@@ -175,14 +200,14 @@ const KanbanBoard: React.FC = () => {
           >
             <Statistic
               title={
-                <span style={{ fontSize: 12, color: '#595959' }}>
+                <span style={{ fontSize: 12, color: STATUS_CARD_STYLES.backlog.textColor }}>
                   <InboxOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.backlog.iconColor }} />
                   백로그
                 </span>
               }
               value={backlogCount}
               suffix="장"
-              valueStyle={{ fontSize: 22, fontWeight: 700, color: '#595959' }}
+              valueStyle={{ fontSize: 22, fontWeight: 700, color: STATUS_CARD_STYLES.backlog.valueColor }}
             />
           </Card>
         </Col>
@@ -193,24 +218,24 @@ const KanbanBoard: React.FC = () => {
             style={{
               background: STATUS_CARD_STYLES.today.background,
               border: `1px solid ${STATUS_CARD_STYLES.today.borderColor}`,
-              borderRadius: 10,
+              borderRadius: 12,
             }}
             styles={{ body: { padding: '12px 16px' } }}
           >
             <Statistic
               title={
-                <span style={{ fontSize: 12, color: '#096dd9' }}>
+                <span style={{ fontSize: 12, color: STATUS_CARD_STYLES.today.textColor }}>
                   <BookOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.today.iconColor }} />
                   오늘 학습
                 </span>
               }
               value={todayCount}
               suffix={
-                <span style={{ fontSize: 13, color: '#1890ff' }}>
+                <span style={{ fontSize: 13, color: STATUS_CARD_STYLES.today.valueColor }}>
                   {dailyProgress ? ` (${dailyProgress.completedToday}완료)` : ''}
                 </span>
               }
-              valueStyle={{ fontSize: 22, fontWeight: 700, color: '#1890ff' }}
+              valueStyle={{ fontSize: 22, fontWeight: 700, color: STATUS_CARD_STYLES.today.valueColor }}
             />
           </Card>
         </Col>
@@ -221,20 +246,20 @@ const KanbanBoard: React.FC = () => {
             style={{
               background: STATUS_CARD_STYLES.reviewing.background,
               border: `1px solid ${STATUS_CARD_STYLES.reviewing.borderColor}`,
-              borderRadius: 10,
+              borderRadius: 12,
             }}
             styles={{ body: { padding: '12px 16px' } }}
           >
             <Statistic
               title={
-                <span style={{ fontSize: 12, color: '#531dab' }}>
+                <span style={{ fontSize: 12, color: STATUS_CARD_STYLES.reviewing.textColor }}>
                   <ClockCircleOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.reviewing.iconColor }} />
                   복습 대기
                 </span>
               }
               value={reviewingCount}
               suffix="장"
-              valueStyle={{ fontSize: 22, fontWeight: 700, color: '#722ed1' }}
+              valueStyle={{ fontSize: 22, fontWeight: 700, color: STATUS_CARD_STYLES.reviewing.valueColor }}
             />
           </Card>
         </Col>
@@ -246,25 +271,45 @@ const KanbanBoard: React.FC = () => {
               style={{
                 background: STATUS_CARD_STYLES.mastered.background,
                 border: `1px solid ${STATUS_CARD_STYLES.mastered.borderColor}`,
-                borderRadius: 10,
+                borderRadius: 12,
               }}
               styles={{ body: { padding: '12px 16px' } }}
             >
               <Statistic
                 title={
-                  <span style={{ fontSize: 12, color: '#389e0d' }}>
+                  <span style={{ fontSize: 12, color: STATUS_CARD_STYLES.mastered.textColor }}>
                     <CheckCircleOutlined style={{ marginRight: 6, color: STATUS_CARD_STYLES.mastered.iconColor }} />
                     마스터
                   </span>
                 }
                 value={masteredCount}
                 suffix="장"
-                valueStyle={{ fontSize: 22, fontWeight: 700, color: '#52c41a' }}
+                valueStyle={{ fontSize: 22, fontWeight: 700, color: STATUS_CARD_STYLES.mastered.valueColor }}
               />
             </Card>
           </Tooltip>
         </Col>
       </Row>
+
+      {/* -- Today's Progress Bar (#5) -- */}
+      {dailyProgress && dailyProgress.totalToday > 0 && (
+        <div style={{ marginBottom: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
+              오늘 진행률
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-primary)' }}>
+              {dailyProgress.completedToday}/{dailyProgress.totalToday}
+            </span>
+          </div>
+          <div className="today-progress-bar">
+            <div
+              className="today-progress-bar-fill"
+              style={{ width: `${Math.round((dailyProgress.completedToday / dailyProgress.totalToday) * 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* -- Today's Cards Section Header -- */}
       <div style={{
@@ -274,7 +319,7 @@ const KanbanBoard: React.FC = () => {
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>
             오늘 학습
-            <span style={{ fontWeight: 400, fontSize: 13, color: '#8c8c8c', marginLeft: 6 }}>
+            <span style={{ fontWeight: 400, fontSize: 13, color: 'var(--text-muted)', marginLeft: 6 }}>
               ({todayTopics.length}장)
             </span>
           </h2>
@@ -315,19 +360,24 @@ const KanbanBoard: React.FC = () => {
         /* -- Empty State -- */
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Card
+            className="animate-slide-up"
             style={{
               maxWidth: 420,
               width: '100%',
               textAlign: 'center',
-              borderRadius: 12,
-              border: '1px dashed #d9d9d9',
+              borderRadius: 16,
+              border: '1px dashed var(--border-strong)',
+              background: 'var(--bg-elevated)',
             }}
             styles={{ body: { padding: '32px 24px' } }}
           >
-            <BookOutlined style={{ fontSize: 40, color: '#bfbfbf', marginBottom: 16 }} />
-            <h3 style={{ margin: '0 0 20px', fontSize: 16, fontWeight: 600, color: '#262626' }}>
-              오늘 학습할 주제가 없습니다
+            <BookOutlined style={{ fontSize: 40, color: 'var(--brand-primary-light)', marginBottom: 16 }} />
+            <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
+              오늘의 학습을 시작해볼까요?
             </h3>
+            <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-secondary)' }}>
+              커리큘럼에서 공부할 주제를 골라보세요
+            </p>
             <div style={{ textAlign: 'left', marginBottom: 24 }}>
               {[
                 { step: '1', text: '커리큘럼에서 공부할 주제를 선택하세요' },
@@ -339,18 +389,18 @@ const KanbanBoard: React.FC = () => {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '10px 0',
-                    borderBottom: step !== '3' ? '1px solid #f0f0f0' : 'none',
+                    borderBottom: step !== '3' ? '1px solid var(--border-color)' : 'none',
                   }}
                 >
                   <div style={{
                     width: 28, height: 28, borderRadius: '50%',
-                    background: '#e6f7ff', color: '#1890ff',
+                    background: 'var(--brand-primary-bg)', color: 'var(--brand-primary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 13, fontWeight: 600, flexShrink: 0,
                   }}>
                     {step}
                   </div>
-                  <span style={{ fontSize: 13, color: '#595959' }}>{text}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{text}</span>
                 </div>
               ))}
             </div>
@@ -359,7 +409,7 @@ const KanbanBoard: React.FC = () => {
               size="large"
               icon={<ArrowRightOutlined />}
               onClick={() => navigate('/curriculum')}
-              style={{ borderRadius: 8 }}
+              style={{ borderRadius: 12, height: 44, fontWeight: 600 }}
             >
               커리큘럼에서 추가하기
             </Button>
@@ -408,14 +458,14 @@ const KanbanBoard: React.FC = () => {
               ghost
               style={{
                 marginTop: 16,
-                background: '#f6ffed',
-                borderRadius: 8,
-                border: '1px solid #b7eb8f',
+                background: 'var(--brand-success-bg)',
+                borderRadius: 12,
+                border: '1px solid var(--status-mastered-border)',
               }}
               items={[{
                 key: 'completed',
                 label: (
-                  <span style={{ fontWeight: 600, fontSize: 14, color: '#389e0d' }}>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--brand-success)' }}>
                     <CheckCircleOutlined style={{ marginRight: 6 }} />
                     오늘 완료 ({completedToday.length}장)
                   </span>
@@ -430,15 +480,15 @@ const KanbanBoard: React.FC = () => {
                           key={topic.id}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 8,
-                            padding: '6px 12px', background: '#ffffff', borderRadius: 6,
-                            cursor: 'pointer', border: '1px solid #d9f7be',
+                            padding: '6px 12px', background: 'var(--bg-elevated)', borderRadius: 8,
+                            cursor: 'pointer', border: '1px solid var(--status-mastered-border)',
                             transition: 'background 0.2s',
                           }}
                           onClick={() => handleCardClick(topic.id)}
-                          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#f6ffed'; }}
-                          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#ffffff'; }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'var(--brand-success-bg)'; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-elevated)'; }}
                         >
-                          <CheckCircleOutlined style={{ color: '#52c41a', flexShrink: 0 }} />
+                          <CheckCircleOutlined style={{ color: 'var(--brand-success)', flexShrink: 0 }} />
                           <span style={{ flex: 1, fontSize: 13 }}>{topic.title}</span>
                           {subject && (
                             <Tag style={{ margin: 0, fontSize: 11 }} color={subject.color}>
@@ -468,6 +518,12 @@ const KanbanBoard: React.FC = () => {
       <CardDetail topicId={detailTopicId} onClose={() => setDetailTopicId(null)} onEdit={handleEditCard} />
       <CardForm open={formOpen} onClose={handleFormClose} subjectId={selectedSubjectId} editTopicId={editTopicId} />
       <SelfEvalModal open={selfEval.open} topicTitle={selfEval.topicTitle} masteryCount={selfEval.masteryCount} onSubmit={submitSelfEval} onCancel={closeSelfEval} />
+
+      {/* -- Reward Feedback (#3) -- */}
+      <RewardToast reward={lastReward} onDone={handleRewardDone} />
+
+      {/* -- Mastery Confetti (#8) -- */}
+      <Confetti active={showConfetti} onDone={handleConfettiDone} />
     </div>
   );
 };

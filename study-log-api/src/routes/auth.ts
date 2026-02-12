@@ -56,6 +56,7 @@ router.post('/register', asyncHandler(async (req, res) => {
   // Create initial user_stats and app_settings
   await pool.query('INSERT INTO user_stats (user_id, total_xp, current_streak, longest_streak) VALUES ($1, 0, 0, 0)', [id]);
   await pool.query('INSERT INTO app_settings (user_id) VALUES ($1)', [id]);
+  await pool.query('INSERT INTO gem_wallets (user_id) VALUES ($1)', [id]);
 
   const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
   res.status(201).json({ user: mapUser(rows[0]), accessToken, refreshToken });

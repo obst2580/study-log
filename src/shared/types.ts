@@ -2,6 +2,32 @@
 
 export type Difficulty = 'high' | 'medium' | 'low';
 export type Importance = 'high' | 'medium' | 'low';
+
+export type GemType = 'emerald' | 'sapphire' | 'ruby' | 'diamond';
+
+export interface GemCost {
+  emerald: number;
+  sapphire: number;
+  ruby: number;
+  diamond: number;
+}
+
+export interface GemWallet {
+  emerald: number;
+  sapphire: number;
+  ruby: number;
+  diamond: number;
+  updatedAt: string;
+}
+
+export interface GemTransaction {
+  id: number;
+  gemType: GemType;
+  amount: number;
+  reason: string;
+  referenceId: string | null;
+  createdAt: string;
+}
 export type KanbanColumn = 'backlog' | 'today' | 'reviewing' | 'mastered';
 export type TimerType = 'pomodoro' | 'stopwatch';
 export type UserRole = 'student' | 'parent';
@@ -60,6 +86,9 @@ export interface Topic {
   nextReviewAt: string | null;
   sortOrder: number;
   masteryCount: number;
+  gemCost: GemCost;
+  purchased: boolean;
+  purchaseDiscount: GemCost;
   createdAt: string;
   updatedAt: string;
 }
@@ -115,6 +144,7 @@ export interface UserStats {
   currentStreak: number;
   longestStreak: number;
   lastStudyDate: string | null;
+  prestigePoints: number;
 }
 
 // ── App Settings ──
@@ -377,6 +407,16 @@ export interface CurriculumTopic {
   checklistItems: { id: string; text: string; sortOrder: number }[];
 }
 
+// -- Curriculum Generation Progress --
+
+export interface CurriculumGenerationProgress {
+  phase: number;
+  totalUnits: number;
+  completedUnits: number;
+  currentSubject?: string;
+  currentUnit?: string;
+}
+
 // -- Daily Progress --
 
 export interface DailyProgress {
@@ -407,4 +447,38 @@ export interface SubjectWithProgress extends Subject {
   reviewingCount: number;
   masteredCount: number;
   units: UnitWithProgress[];
+}
+
+// -- Splendor / Gem Economy --
+
+export interface NobleProgress {
+  unitId: string;
+  unitName: string;
+  subjectName: string;
+  subjectColor: string;
+  totalTopics: number;
+  masteredTopics: number;
+  completed: boolean;
+}
+
+export interface CardDetail {
+  topic: Topic;
+  baseCost: GemCost;
+  discount: GemCost;
+  effectiveCost: GemCost;
+  purchasable: boolean;
+  alreadyPurchased: boolean;
+}
+
+export interface SubjectDiscount {
+  subjectId: string;
+  subjectName: string;
+  masteredCount: number;
+  discount: GemCost;
+}
+
+export interface SplendorOverview {
+  wallet: GemWallet;
+  prestigePoints: number;
+  nobles: NobleProgress[];
 }

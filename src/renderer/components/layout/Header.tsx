@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Badge, Space, Tooltip, Switch, Popover, List, Typography, Empty } from 'antd';
+import { Button, Badge, Space, Tooltip, Switch, Popover, List, Typography, Empty, Tag } from 'antd';
 import {
   SearchOutlined,
   ClockCircleOutlined,
@@ -9,12 +9,16 @@ import {
   SunOutlined,
   MoonOutlined,
   CheckOutlined,
+  FireOutlined,
+  StarOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../stores/appStore';
 import { useTimerStore } from '../../stores/timerStore';
 import { formatTime } from '../../hooks/useTimer';
 import { useNotification } from '../../hooks/useNotification';
+import { useUserStats } from '../../hooks/useDatabase';
+import { calculateLevel } from '../../utils/xp';
 import GlobalSearch from '../search/GlobalSearch';
 
 const { Text } = Typography;
@@ -34,6 +38,8 @@ const Header: React.FC = () => {
   const toggleMinimized = useTimerStore((s) => s.toggleMinimized);
   const minimized = useTimerStore((s) => s.minimized);
 
+  const { stats } = useUserStats();
+
   const {
     notifications,
     unreadCount,
@@ -44,6 +50,10 @@ const Header: React.FC = () => {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+
+  const currentStreak = stats?.currentStreak ?? 0;
+  const totalXp = stats?.totalXp ?? 0;
+  const level = calculateLevel(totalXp);
 
   // Global Ctrl+K shortcut
   useEffect(() => {
@@ -75,7 +85,7 @@ const Header: React.FC = () => {
   };
 
   const notificationTypeColors: Record<string, string> = {
-    review: '#1890ff',
+    review: '#6366F1',
     streak: '#faad14',
     exam: '#722ed1',
     info: '#52c41a',
@@ -148,6 +158,22 @@ const Header: React.FC = () => {
             aria-label={sidebarCollapsed ? '사이드바 열기' : '사이드바 닫기'}
           />
           <span style={{ fontWeight: 700, fontSize: 16 }}>StudyLog</span>
+          <Space size={4}>
+            <Tag
+              icon={<FireOutlined />}
+              color="#F59E0B"
+              style={{ margin: 0, fontSize: 11, fontWeight: 600, borderRadius: 12 }}
+            >
+              {currentStreak}일
+            </Tag>
+            <Tag
+              icon={<StarOutlined />}
+              color="#6366F1"
+              style={{ margin: 0, fontSize: 11, fontWeight: 600, borderRadius: 12 }}
+            >
+              Lv.{level}
+            </Tag>
+          </Space>
         </Space>
 
         <Space size="middle" align="center">
@@ -164,7 +190,7 @@ const Header: React.FC = () => {
             <Button
               type="text"
               icon={<ClockCircleOutlined />}
-              style={isTimerRunning ? { color: '#1890ff', fontWeight: 600 } : undefined}
+              style={isTimerRunning ? { color: '#6366F1', fontWeight: 600 } : undefined}
               onClick={handleTimerClick}
               aria-label={isTimerRunning ? `타이머: ${timerDisplay}` : '타이머'}
             >

@@ -5,6 +5,7 @@ import {
   BookOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
+import GemWalletDisplay from '../splendor/GemWallet';
 import ContributionGraph from './ContributionGraph';
 import StreakCard from './StreakCard';
 import LevelCard from './LevelCard';
@@ -12,6 +13,7 @@ import SubjectRadar from './SubjectRadar';
 import WeeklyGoalPanel from '../goals/WeeklyGoalPanel';
 import { useUserStats, useSubjectMastery } from '../../hooks/useDatabase';
 import { useKanbanStore } from '../../stores/kanbanStore';
+import { useSplendorStore } from '../../stores/splendorStore';
 import { useAuthStore } from '../../stores/authStore';
 import { apiService } from '../../api/apiService';
 import type { WeakTopic, AchievementWithStatus, ChallengeWithParticipants } from '../../../shared/types';
@@ -21,10 +23,16 @@ const Dashboard: React.FC = () => {
   const { mastery } = useSubjectMastery();
   const topics = useKanbanStore((s) => s.topics);
   const user = useAuthStore((s) => s.user);
+  const wallet = useSplendorStore((s) => s.wallet);
+  const loadWallet = useSplendorStore((s) => s.loadWallet);
 
   const [weakTopics, setWeakTopics] = useState<WeakTopic[]>([]);
   const [recentAchievements, setRecentAchievements] = useState<AchievementWithStatus[]>([]);
   const [activeChallenges, setActiveChallenges] = useState<ChallengeWithParticipants[]>([]);
+
+  useEffect(() => {
+    loadWallet();
+  }, [loadWallet]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -88,6 +96,12 @@ const Dashboard: React.FC = () => {
         </Col>
         <Col xs={24} sm={12} md={6}>
           <LevelCard totalXp={stats?.totalXp ?? 0} />
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+        <Col xs={24} md={12}>
+          <GemWalletDisplay wallet={wallet} compact />
         </Col>
       </Row>
 

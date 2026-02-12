@@ -10,11 +10,11 @@ interface SelfEvalModalProps {
 }
 
 const SCORE_LABELS: Record<number, string> = {
-  1: '전혀 모름',
-  2: '잘 모름',
-  3: '보통',
-  4: '이해함',
-  5: '완벽',
+  1: '처음 만남',
+  2: '조금 익숙해짐',
+  3: '감 잡는 중',
+  4: '거의 다 왔어!',
+  5: '완벽 마스터',
 };
 
 const INTERVAL_DAYS: Record<number, number> = {
@@ -26,11 +26,11 @@ const INTERVAL_DAYS: Record<number, number> = {
 };
 
 const SCORE_COLORS: Record<number, { bg: string; border: string; text: string }> = {
-  1: { bg: '#fff2f0', border: '#ffccc7', text: '#cf1322' },
-  2: { bg: '#fff7e6', border: '#ffd591', text: '#d46b08' },
-  3: { bg: '#e6f7ff', border: '#91d5ff', text: '#096dd9' },
-  4: { bg: '#f6ffed', border: '#b7eb8f', text: '#389e0d' },
-  5: { bg: '#fffbe6', border: '#ffe58f', text: '#d4a017' },
+  1: { bg: '#EEF2FF', border: '#C7D2FE', text: '#4338CA' },
+  2: { bg: '#FFF7ED', border: '#FED7AA', text: '#C2410C' },
+  3: { bg: '#EFF6FF', border: '#BFDBFE', text: '#1D4ED8' },
+  4: { bg: '#ECFDF5', border: '#A7F3D0', text: '#065F46' },
+  5: { bg: '#FFFBEB', border: '#FDE68A', text: '#92400E' },
 };
 
 const MASTERY_THRESHOLD = 3;
@@ -49,22 +49,23 @@ const SelfEvalModal: React.FC<SelfEvalModalProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [score, setScore] = useState(3);
+  const [score, setScore] = useState(0);
   const [note, setNote] = useState('');
 
   const handleSubmit = () => {
+    if (score === 0) return;
     onSubmit({ understandingScore: score, selfNote: note });
-    setScore(3);
+    setScore(0);
     setNote('');
   };
 
   const handleCancel = () => {
-    setScore(3);
+    setScore(0);
     setNote('');
     onCancel();
   };
 
-  const colors = SCORE_COLORS[score];
+  const colors = SCORE_COLORS[score] ?? SCORE_COLORS[3];
   const nextMasteryCount = useMemo(
     () => getMasteryAfterReview(score, masteryCount),
     [score, masteryCount],
@@ -80,7 +81,7 @@ const SelfEvalModal: React.FC<SelfEvalModalProps> = ({
       footer={
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
           <Button onClick={handleCancel}>취소</Button>
-          <Button type="primary" onClick={handleSubmit}>
+          <Button type="primary" onClick={handleSubmit} disabled={score === 0}>
             확인
           </Button>
         </div>
@@ -89,8 +90,8 @@ const SelfEvalModal: React.FC<SelfEvalModalProps> = ({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Topic title */}
         <div>
-          <p style={{ fontWeight: 500, marginBottom: 4 }}>{topicTitle}</p>
-          <p style={{ color: '#666', fontSize: 13 }}>이 토픽에 대한 이해도를 평가하세요.</p>
+          <p style={{ fontWeight: 600, marginBottom: 4, fontSize: 15 }}>{topicTitle}</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>이 토픽에 대한 이해도를 평가하세요.</p>
         </div>
 
         {/* Score selector with bigger stars */}
@@ -103,29 +104,31 @@ const SelfEvalModal: React.FC<SelfEvalModalProps> = ({
               tooltips={Object.values(SCORE_LABELS)}
               style={{ fontSize: 28 }}
             />
-            <span
-              style={{
-                color: colors.text,
-                fontSize: 14,
-                fontWeight: 600,
-                padding: '2px 10px',
-                background: colors.bg,
-                border: `1px solid ${colors.border}`,
-                borderRadius: 12,
-              }}
-            >
-              {SCORE_LABELS[score]}
-            </span>
+            {score > 0 && (
+              <span
+                style={{
+                  color: colors.text,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: '2px 10px',
+                  background: colors.bg,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 12,
+                }}
+              >
+                {SCORE_LABELS[score]}
+              </span>
+            )}
           </div>
         </div>
 
         {/* Result preview card */}
-        <div
+        {score > 0 && <div
           style={{
             padding: '12px 16px',
             background: colors.bg,
             border: `1px solid ${colors.border}`,
-            borderRadius: 8,
+            borderRadius: 12,
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
@@ -143,17 +146,18 @@ const SelfEvalModal: React.FC<SelfEvalModalProps> = ({
             </span>
             {score === 5 && willMaster && (
               <span
+                className="animate-celebrate"
                 style={{
                   fontSize: 12,
                   fontWeight: 700,
-                  color: '#389e0d',
-                  background: '#f6ffed',
-                  border: '1px solid #b7eb8f',
+                  color: 'var(--brand-success)',
+                  background: 'var(--brand-success-bg)',
+                  border: '1px solid var(--status-mastered-border)',
                   padding: '2px 8px',
                   borderRadius: 10,
                 }}
               >
-                이번이 마스터!
+                마스터 달성!
               </span>
             )}
           </div>
@@ -169,26 +173,26 @@ const SelfEvalModal: React.FC<SelfEvalModalProps> = ({
                   marginBottom: 4,
                 }}
               >
-                <span style={{ fontSize: 12, color: '#666' }}>
+                <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                   마스터까지: {Math.min(nextMasteryCount, MASTERY_THRESHOLD)}/{MASTERY_THRESHOLD}
                 </span>
               </div>
               <Progress
                 percent={Math.round((Math.min(nextMasteryCount, MASTERY_THRESHOLD) / MASTERY_THRESHOLD) * 100)}
                 size="small"
-                strokeColor={willMaster ? '#52c41a' : '#faad14'}
+                strokeColor={willMaster ? '#10B981' : '#F59E0B'}
                 showInfo={false}
               />
             </div>
           )}
 
           {/* Interval guide */}
-          <div style={{ fontSize: 12, color: '#888' }}>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
             점수에 따라 다음 복습이 자동 설정됩니다 (1점:1일, 2점:2일, 3점:4일, 4점:10일, 5점:30일)
             <br />
             5점 3회 연속 달성 시 마스터!
           </div>
-        </div>
+        </div>}
 
         {/* Note field */}
         <div>

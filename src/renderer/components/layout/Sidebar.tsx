@@ -18,6 +18,7 @@ import {
   BarChartOutlined,
   FlagOutlined,
   LineChartOutlined,
+  GoldOutlined,
 } from '@ant-design/icons';
 import { useAppStore } from '../../stores/appStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -58,17 +59,35 @@ const Sidebar: React.FC = () => {
   };
 
   const viewItems = [
+    // 학습 (Study) - always expanded
     { key: '/kanban', icon: <AppstoreOutlined />, label: '칸반 보드' },
     { key: '/curriculum', icon: <BookOutlined />, label: '커리큘럼 관리' },
-    { key: '/dashboard', icon: <DashboardOutlined />, label: '대시보드' },
-    { key: '/calendar', icon: <CalendarOutlined />, label: '달력' },
-    { key: '/timeline', icon: <FieldTimeOutlined />, label: '타임라인' },
     { key: '/timer', icon: <ClockCircleOutlined />, label: '타이머' },
-    { key: '/reflection', icon: <FormOutlined />, label: '주간 성찰' },
-    { key: '/achievements', icon: <StarOutlined />, label: '업적' },
-    { key: '/report', icon: <BarChartOutlined />, label: '월간 리포트' },
-    { key: '/challenges', icon: <FlagOutlined />, label: '챌린지' },
-    { key: '/analysis', icon: <LineChartOutlined />, label: '학습 패턴' },
+
+    // 기록 (Records) - item group
+    {
+      type: 'group' as const,
+      label: '기록',
+      children: [
+        { key: '/dashboard', icon: <DashboardOutlined />, label: '대시보드' },
+        { key: '/calendar', icon: <CalendarOutlined />, label: '달력' },
+        { key: '/timeline', icon: <FieldTimeOutlined />, label: '타임라인' },
+        { key: '/report', icon: <BarChartOutlined />, label: '월간 리포트' },
+        { key: '/analysis', icon: <LineChartOutlined />, label: '학습 패턴' },
+        { key: '/reflection', icon: <FormOutlined />, label: '주간 성찰' },
+      ]
+    },
+
+    // 도전 (Challenges) - item group
+    {
+      type: 'group' as const,
+      label: '도전',
+      children: [
+        { key: '/achievements', icon: <StarOutlined />, label: '업적' },
+        { key: '/challenges', icon: <FlagOutlined />, label: '챌린지' },
+        { key: '/splendor', icon: <GoldOutlined />, label: '보석 상점' },
+      ]
+    }
   ];
 
   const subjectItems = [
@@ -93,13 +112,58 @@ const Sidebar: React.FC = () => {
   ];
 
   if (sidebarCollapsed) {
+    const studyItems = [
+      { key: '/kanban', icon: <AppstoreOutlined />, label: '칸반 보드' },
+      { key: '/curriculum', icon: <BookOutlined />, label: '커리큘럼 관리' },
+      { key: '/timer', icon: <ClockCircleOutlined />, label: '타이머' },
+    ];
+
+    const recordItems = [
+      { key: '/dashboard', icon: <DashboardOutlined />, label: '대시보드' },
+      { key: '/calendar', icon: <CalendarOutlined />, label: '달력' },
+      { key: '/timeline', icon: <FieldTimeOutlined />, label: '타임라인' },
+      { key: '/report', icon: <BarChartOutlined />, label: '월간 리포트' },
+      { key: '/analysis', icon: <LineChartOutlined />, label: '학습 패턴' },
+      { key: '/reflection', icon: <FormOutlined />, label: '주간 성찰' },
+    ];
+
+    const challengeItems = [
+      { key: '/achievements', icon: <StarOutlined />, label: '업적' },
+      { key: '/challenges', icon: <FlagOutlined />, label: '챌린지' },
+      { key: '/splendor', icon: <GoldOutlined />, label: '보석 상점' },
+    ];
+
     return (
       <div
         style={{ padding: '8px 4px', display: 'flex', flexDirection: 'column', gap: 4 }}
         role="navigation"
         aria-label="주요 내비게이션"
       >
-        {viewItems.map((item) => (
+        {studyItems.map((item) => (
+          <Button
+            key={item.key}
+            type={location.pathname === item.key ? 'primary' : 'text'}
+            icon={item.icon}
+            size="small"
+            onClick={() => navigate(item.key)}
+            aria-label={item.label}
+            title={item.label}
+          />
+        ))}
+        <div style={{ height: 1, background: 'var(--border-color, #f0f0f0)', margin: '4px 0' }} />
+        {recordItems.map((item) => (
+          <Button
+            key={item.key}
+            type={location.pathname === item.key ? 'primary' : 'text'}
+            icon={item.icon}
+            size="small"
+            onClick={() => navigate(item.key)}
+            aria-label={item.label}
+            title={item.label}
+          />
+        ))}
+        <div style={{ height: 1, background: 'var(--border-color, #f0f0f0)', margin: '4px 0' }} />
+        {challengeItems.map((item) => (
           <Button
             key={item.key}
             type={location.pathname === item.key ? 'primary' : 'text'}
@@ -140,7 +204,7 @@ const Sidebar: React.FC = () => {
         style={{ borderRight: 0 }}
       />
 
-      <div style={{ padding: '8px 16px', fontWeight: 600, fontSize: 12, color: '#999', textTransform: 'uppercase' }}>
+      <div style={{ padding: '8px 16px', fontWeight: 600, fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
         과목
       </div>
 

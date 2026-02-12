@@ -18,6 +18,14 @@ export type {
   SubjectMastery,
   UnitWithProgress,
   SubjectWithProgress,
+  GemType,
+  GemCost,
+  GemWallet,
+  GemTransaction,
+  NobleProgress,
+  CardDetail,
+  SubjectDiscount,
+  SplendorOverview,
 } from '../../shared/types';
 
 export { KANBAN_COLUMNS } from '../../shared/types';

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { getPool } from '../database/index.js';
+import { calculateGemCost } from '../services/gemCostCalculator.js';
 import {
   mapTopic,
   mapSubject,
@@ -154,14 +155,19 @@ router.post('/', asyncHandler(async (req, res) => {
     [columnName]
   );
 
+  const effectiveDifficulty = difficulty ?? 'medium';
+  const effectiveImportance = importance ?? 'medium';
+  const gemCost = calculateGemCost(effectiveDifficulty, effectiveImportance);
+
   await pool.query(`
-    INSERT INTO topics (id, subject_id, unit_id, title, notes, difficulty, importance, tags, column_name, sort_order)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    INSERT INTO topics (id, subject_id, unit_id, title, notes, difficulty, importance, tags, column_name, sort_order, gem_cost)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
   `, [
     id, subjectId, unitId, title,
-    notes ?? '', difficulty ?? 'medium', importance ?? 'medium',
+    notes ?? '', effectiveDifficulty, effectiveImportance,
     JSON.stringify(tags ?? []),
     columnName, maxOrder.rows[0].next_order,
+    JSON.stringify(gemCost),
   ]);
 
   const { rows } = await pool.query('SELECT * FROM topics WHERE id = $1', [id]);

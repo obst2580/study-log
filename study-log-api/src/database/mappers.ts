@@ -55,6 +55,9 @@ export function mapTopic(row: DbRow) {
     nextReviewAt: (row.next_review_at as string) || null,
     sortOrder: row.sort_order as number,
     masteryCount: row.mastery_count as number,
+    gemCost: row.gem_cost as { emerald: number; sapphire: number; ruby: number; diamond: number },
+    purchased: Boolean(row.purchased),
+    purchaseDiscount: row.purchase_discount as { emerald: number; sapphire: number; ruby: number; diamond: number },
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -205,6 +208,28 @@ export function mapUserStats(row: DbRow) {
     currentStreak: row.current_streak as number,
     longestStreak: row.longest_streak as number,
     lastStudyDate: (row.last_study_date as string) || null,
+    prestigePoints: (row.prestige_points as number) ?? 0,
+  };
+}
+
+export function mapGemWallet(row: DbRow) {
+  return {
+    emerald: row.emerald as number,
+    sapphire: row.sapphire as number,
+    ruby: row.ruby as number,
+    diamond: row.diamond as number,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+export function mapGemTransaction(row: DbRow) {
+  return {
+    id: row.id as number,
+    gemType: row.gem_type as string,
+    amount: row.amount as number,
+    reason: row.reason as string,
+    referenceId: (row.reference_id as string) || null,
+    createdAt: row.created_at as string,
   };
 }
 

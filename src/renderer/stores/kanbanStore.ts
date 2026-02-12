@@ -10,6 +10,13 @@ interface SelfEvalState {
   masteryCount: number;
 }
 
+export interface RewardData {
+  xp: number;
+  gems: { type: string; amount: number }[];
+  mastered: boolean;
+  topicTitle: string;
+}
+
 interface KanbanState {
   topics: Topic[];
   completedToday: Topic[];
@@ -17,6 +24,9 @@ interface KanbanState {
   loading: boolean;
   error: string | null;
   lastSubjectFilter: string | null;
+
+  lastReward: RewardData | null;
+  clearReward: () => void;
 
   selfEval: SelfEvalState;
   openSelfEval: (topicId: string, topicTitle: string, fromColumn: KanbanColumn) => void;
@@ -51,6 +61,9 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   error: null,
   lastSubjectFilter: null,
 
+  lastReward: null,
+  clearReward: () => set({ lastReward: null }),
+
   selfEval: { ...INITIAL_SELF_EVAL },
 
   openSelfEval: (topicId, topicTitle, fromColumn) => {
@@ -68,12 +81,25 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     if (!selfEval.topicId) return;
 
     try {
-      await apiService.createReview({
+      const result = await apiService.createReview({
         topicId: selfEval.topicId,
         fromColumn: selfEval.fromColumn,
         understandingScore,
         selfNote,
       });
+
+      // Show reward toast
+      if (result.xpAwarded || (result.gemsAwarded && result.gemsAwarded.length > 0)) {
+        set({
+          lastReward: {
+            xp: result.xpAwarded ?? 0,
+            gems: result.gemsAwarded ?? [],
+            mastered: result.mastered ?? false,
+            topicTitle: selfEval.topicTitle,
+          },
+        });
+      }
+
       await get().loadTopics(lastSubjectFilter);
       await get().loadCompletedToday();
       await get().loadDailyProgress();

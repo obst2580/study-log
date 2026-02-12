@@ -4,6 +4,7 @@ import { getPool } from '../database/index.js';
 import { mapStudySession } from '../database/mappers.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { MS_PER_DAY } from '../utils/constants.js';
+import { earnGems } from '../services/gemEngine.js';
 
 const router = Router();
 
@@ -102,6 +103,12 @@ router.post('/', asyncHandler(async (req, res) => {
 
     await client.query('UPDATE user_stats SET total_xp = total_xp + 10 WHERE user_id = $1', [req.userId]);
     await client.query('INSERT INTO xp_log (amount, reason, user_id) VALUES (10, $1, $2)', ['study_session', req.userId]);
+
+    // Award emeralds: 1 per 30 minutes
+    const emeraldCount = Math.floor(duration / 1800);
+    if (emeraldCount > 0) {
+      await earnGems(req.userId, 'emerald', emeraldCount, 'study_session', id, client);
+    }
 
     const sessionResult = await client.query('SELECT * FROM study_sessions WHERE id = $1', [id]);
 

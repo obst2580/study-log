@@ -7,8 +7,9 @@ import type {
   WeeklyReflection, Achievement, AchievementWithStatus,
   WeakTopic, StudyEfficiency,
   MonthlyReport, ChallengeWithParticipants, LearningPatterns,
-  CurriculumTemplate, CurriculumTemplateDetail,
+  CurriculumTemplate, CurriculumTemplateDetail, CurriculumGenerationProgress,
   DailyProgress, CurriculumProgress, SubjectWithProgress,
+  GemWallet, GemTransaction, CardDetail, NobleProgress, SubjectDiscount, SplendorOverview,
 } from '../../shared/types';
 
 type QueryParams = Record<string, string | number | boolean | undefined>;
@@ -30,9 +31,10 @@ export const apiService = {
   // Curriculum
   getCurriculumTemplates: () => api.get<CurriculumTemplate[]>('/curriculum/templates'),
   getCurriculumTemplate: (grade: string) => api.get<CurriculumTemplateDetail>(`/curriculum/templates/${grade}`),
-  generateCurriculum: (grade: string) => api.post<{ id: string; status: string }>('/curriculum/generate', { grade }),
-  getCurriculumStatus: (id: string) => api.get<{ id: string; status: string }>(`/curriculum/generate/${id}/status`),
+  getGradeStatus: (grade: string) => api.get<{ grade: string; status: string; progress?: CurriculumGenerationProgress }>(`/curriculum/grade-status/${grade}`),
+  applyGrade: (grade: string) => api.post<{ success: boolean }>('/curriculum/apply-grade', { grade }),
   applyCurriculum: (templateId: string) => api.post<{ success: boolean }>('/curriculum/apply', { templateId }),
+  resetCurriculum: () => api.post<{ success: boolean; message: string }>('/curriculum/reset'),
 
   // Subjects
   getSubjects: () => api.get<Subject[]>('/subjects'),
@@ -99,7 +101,7 @@ export const apiService = {
 
   // Reviews
   createReview: (data: { topicId: string; fromColumn: string; toColumn?: string; understandingScore?: number; selfNote?: string }) =>
-    api.post<{ success: boolean; review?: ReviewEntry; topic?: Topic; xpAwarded?: number }>('/reviews', data),
+    api.post<{ success: boolean; review?: ReviewEntry; topic?: Topic; xpAwarded?: number; gemsAwarded?: { type: string; amount: number }[]; mastered?: boolean }>('/reviews', data),
   getReviewsByTopic: (topicId: string) => api.get<ReviewEntry[]>(`/reviews/by-topic/${topicId}`),
   getRecentReviews: (limit?: number) => api.get<ReviewEntry[]>(`/reviews/recent${limit ? `?limit=${limit}` : ''}`),
   getUpcomingReviews: () => api.get<Topic[]>('/reviews/upcoming'),
@@ -174,6 +176,19 @@ export const apiService = {
   getCurriculumTree: () => api.get<SubjectWithProgress[]>('/topics/curriculum-tree'),
   assignTopicToToday: (topicId: string) => api.post<Topic>(`/topics/${topicId}/assign-today`),
   bulkAssignToToday: (topicIds: string[]) => api.post<Topic[]>('/topics/bulk-assign-today', { topicIds }),
+
+  // Splendor
+  getGemWallet: () => api.get<GemWallet>('/splendor/wallet'),
+  getGemTransactions: async (limit = 20, offset = 0) => {
+    const result = await api.get<{ transactions: GemTransaction[]; total: number }>(`/splendor/transactions?limit=${limit}&offset=${offset}`);
+    return result.transactions;
+  },
+  getCardDetail: (topicId: string) => api.get<CardDetail>(`/splendor/card/${topicId}`),
+  purchaseCard: (topicId: string) =>
+    api.post<{ success: boolean; topic: Topic; wallet: GemWallet; prestigeAwarded: number }>(`/splendor/purchase/${topicId}`),
+  getNobles: () => api.get<NobleProgress[]>('/splendor/nobles'),
+  getDiscounts: () => api.get<SubjectDiscount[]>('/splendor/discounts'),
+  getSplendorOverview: () => api.get<SplendorOverview>('/splendor/overview'),
 
   // Backup
   exportData: () => api.get<unknown>('/backup/export'),

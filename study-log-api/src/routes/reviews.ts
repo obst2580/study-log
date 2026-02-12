@@ -4,6 +4,7 @@ import { getPool } from '../database/index.js';
 import { mapReviewEntry, mapTopicWithJoins, mapTopic } from '../database/mappers.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { SCORE_TO_INTERVAL_DAYS, MASTERY_THRESHOLD, MS_PER_DAY } from '../utils/constants.js';
+import { earnGems } from '../services/gemEngine.js';
 
 const router = Router();
 
@@ -129,6 +130,34 @@ router.post('/', asyncHandler(async (req, res) => {
       xpAmount, targetColumn === 'mastered' ? 'topic_mastered' : 'review_completed', req.userId,
     ]);
 
+    // Award gems based on review quality
+    // Sapphire: review note >= 50 chars
+    if (selfNote && selfNote.length >= 50) {
+      await earnGems(req.userId, 'sapphire', 1, 'review_note_quality', id, client);
+    }
+
+    // Ruby: understanding score >= 4
+    if (understandingScore >= 4) {
+      await earnGems(req.userId, 'ruby', 1, 'understanding_high', id, client);
+    }
+
+    // Diamond: understanding score === 5
+    if (understandingScore === 5) {
+      await earnGems(req.userId, 'diamond', 1, 'understanding_perfect', id, client);
+    }
+
+    // Collect gem awards for response
+    const gemsAwarded: { type: string; amount: number }[] = [];
+    if (selfNote && selfNote.length >= 50) {
+      gemsAwarded.push({ type: 'sapphire', amount: 1 });
+    }
+    if (understandingScore >= 4) {
+      gemsAwarded.push({ type: 'ruby', amount: 1 });
+    }
+    if (understandingScore === 5) {
+      gemsAwarded.push({ type: 'diamond', amount: 1 });
+    }
+
     const reviewResult = await client.query('SELECT * FROM review_entries WHERE id = $1', [id]);
     const topicResult = await client.query('SELECT * FROM topics WHERE id = $1', [topicId]);
 
@@ -139,6 +168,8 @@ router.post('/', asyncHandler(async (req, res) => {
       review: mapReviewEntry(reviewResult.rows[0]),
       topic: mapTopic(topicResult.rows[0]),
       xpAwarded: xpAmount,
+      gemsAwarded,
+      mastered: targetColumn === 'mastered',
     });
   } catch (e) {
     await client.query('ROLLBACK');

@@ -1,5 +1,6 @@
 import { Pool, PoolClient } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
+import { calculateGemCost } from '../services/gemCostCalculator.js';
 
 interface Migration {
   version: number;
@@ -485,6 +486,97 @@ const migrations: Migration[] = [
           ON topics(column_name, next_review_at)
           WHERE column_name = 'reviewing'
       `);
+    },
+  },
+  {
+    version: 9,
+    description: 'Add gem economy tables and columns for Study Splendor',
+    up: async (client) => {
+      // 1. Create gem_wallets table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS gem_wallets (
+          user_id TEXT PRIMARY KEY REFERENCES users(id),
+          emerald INTEGER NOT NULL DEFAULT 0,
+          sapphire INTEGER NOT NULL DEFAULT 0,
+          ruby INTEGER NOT NULL DEFAULT 0,
+          diamond INTEGER NOT NULL DEFAULT 0,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+
+      // 2. Create gem_transactions table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS gem_transactions (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL REFERENCES users(id),
+          gem_type TEXT NOT NULL CHECK (gem_type IN ('emerald','sapphire','ruby','diamond')),
+          amount INTEGER NOT NULL,
+          reason TEXT NOT NULL,
+          reference_id TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      await client.query('CREATE INDEX IF NOT EXISTS idx_gem_tx_user ON gem_transactions(user_id)');
+      await client.query('CREATE INDEX IF NOT EXISTS idx_gem_tx_created ON gem_transactions(created_at)');
+
+      // 3. Add columns to topics
+      const gemCostCol = await client.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'topics' AND column_name = 'gem_cost'"
+      );
+      if (gemCostCol.rows.length === 0) {
+        await client.query(`ALTER TABLE topics ADD COLUMN gem_cost JSONB NOT NULL DEFAULT '{"emerald":0,"sapphire":0,"ruby":0,"diamond":0}'`);
+      }
+
+      const purchasedCol = await client.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'topics' AND column_name = 'purchased'"
+      );
+      if (purchasedCol.rows.length === 0) {
+        await client.query('ALTER TABLE topics ADD COLUMN purchased BOOLEAN NOT NULL DEFAULT FALSE');
+      }
+
+      const discountCol = await client.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'topics' AND column_name = 'purchase_discount'"
+      );
+      if (discountCol.rows.length === 0) {
+        await client.query(`ALTER TABLE topics ADD COLUMN purchase_discount JSONB NOT NULL DEFAULT '{"emerald":0,"sapphire":0,"ruby":0,"diamond":0}'`);
+      }
+
+      // 4. Add prestige_points to user_stats
+      const prestigeCol = await client.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'user_stats' AND column_name = 'prestige_points'"
+      );
+      if (prestigeCol.rows.length === 0) {
+        await client.query('ALTER TABLE user_stats ADD COLUMN prestige_points INTEGER NOT NULL DEFAULT 0');
+      }
+
+      // 5. Backfill existing topics with calculated gem_cost
+      const { rows: topics } = await client.query('SELECT id, difficulty, importance FROM topics');
+      for (const topic of topics) {
+        const cost = calculateGemCost(topic.difficulty as string, topic.importance as string);
+        await client.query('UPDATE topics SET gem_cost = $1 WHERE id = $2', [JSON.stringify(cost), topic.id]);
+      }
+
+      // 6. Mark mastered topics as purchased=true
+      await client.query("UPDATE topics SET purchased = true WHERE column_name = 'mastered'");
+
+      // 7. Create gem_wallets for existing users
+      await client.query(`
+        INSERT INTO gem_wallets (user_id)
+        SELECT id FROM users
+        WHERE id NOT IN (SELECT user_id FROM gem_wallets)
+      `);
+    },
+  },
+  {
+    version: 10,
+    description: 'Add progress column to curriculum_templates for two-phase generation',
+    up: async (client) => {
+      const progressCol = await client.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'curriculum_templates' AND column_name = 'progress'"
+      );
+      if (progressCol.rows.length === 0) {
+        await client.query(`ALTER TABLE curriculum_templates ADD COLUMN progress JSONB NOT NULL DEFAULT '{}'`);
+      }
     },
   },
 ];

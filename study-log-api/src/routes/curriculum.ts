@@ -1,7 +1,14 @@
 import { Router } from 'express';
 import { getPool } from '../database/index.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { getOrGenerateTemplate, copyTemplateToUser, getTemplateStatus } from '../services/curriculumService.js';
+import {
+  copyTemplateToUser,
+  getTemplateStatus,
+  getTemplateStatusWithProgress,
+  getGradeStatusWithProgress,
+  applyGradeToUser,
+  resetAndRegenerateAll,
+} from '../services/curriculumService.js';
 
 const router = Router();
 
@@ -9,7 +16,7 @@ const router = Router();
 router.get('/templates', asyncHandler(async (_req, res) => {
   const pool = getPool();
   const { rows } = await pool.query(
-    "SELECT * FROM curriculum_templates WHERE status = 'active' ORDER BY grade"
+    'SELECT * FROM curriculum_templates ORDER BY grade'
   );
   res.json(rows.map((r) => ({
     id: r.id,
@@ -105,8 +112,34 @@ router.get('/templates/:grade', asyncHandler(async (req, res) => {
   });
 }));
 
-// POST /api/curriculum/generate
-router.post('/generate', asyncHandler(async (req, res) => {
+// GET /api/curriculum/grade-status/:grade - 학년별 생성 상태 조회
+router.get('/grade-status/:grade', asyncHandler(async (req, res) => {
+  const { grade } = req.params;
+  const result = await getGradeStatusWithProgress(grade);
+
+  if (!result) {
+    res.status(404).json({ error: 'Template not found for this grade' });
+    return;
+  }
+
+  res.json({ grade, status: result.status, progress: result.progress });
+}));
+
+// GET /api/curriculum/generate/:id/status - 템플릿 ID로 상태 조회 (하위 호환)
+router.get('/generate/:id/status', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const result = await getTemplateStatusWithProgress(id);
+
+  if (result.status === 'not_found') {
+    res.status(404).json({ error: 'Template not found' });
+    return;
+  }
+
+  res.json({ id, status: result.status, progress: result.progress });
+}));
+
+// POST /api/curriculum/apply-grade - 학년 선택 → 자동 적용
+router.post('/apply-grade', asyncHandler(async (req, res) => {
   const { grade } = req.body;
 
   if (!grade) {
@@ -114,24 +147,17 @@ router.post('/generate', asyncHandler(async (req, res) => {
     return;
   }
 
-  const result = await getOrGenerateTemplate(grade);
-  res.json(result);
-}));
+  const result = await applyGradeToUser(grade, req.userId);
 
-// GET /api/curriculum/generate/:id/status
-router.get('/generate/:id/status', asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const status = await getTemplateStatus(id);
-
-  if (status === 'not_found') {
-    res.status(404).json({ error: 'Template not found' });
+  if (!result.success) {
+    res.status(400).json({ error: result.error });
     return;
   }
 
-  res.json({ id, status });
+  res.json({ success: true });
 }));
 
-// POST /api/curriculum/apply
+// POST /api/curriculum/apply - 템플릿 ID로 적용 (하위 호환)
 router.post('/apply', asyncHandler(async (req, res) => {
   const { templateId } = req.body;
 
@@ -148,6 +174,12 @@ router.post('/apply', asyncHandler(async (req, res) => {
 
   await copyTemplateToUser(templateId, req.userId);
   res.json({ success: true });
+}));
+
+// POST /api/curriculum/reset - 전체 초기화 및 재생성 (관리용)
+router.post('/reset', asyncHandler(async (_req, res) => {
+  await resetAndRegenerateAll();
+  res.json({ success: true, message: 'All templates reset and regeneration started' });
 }));
 
 export default router;

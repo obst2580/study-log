@@ -57,6 +57,9 @@ export async function createSchema(pool: Pool): Promise<void> {
       next_review_at TIMESTAMPTZ,
       sort_order INTEGER NOT NULL DEFAULT 0,
       mastery_count INTEGER NOT NULL DEFAULT 0,
+      gem_cost JSONB NOT NULL DEFAULT '{"emerald":0,"sapphire":0,"ruby":0,"diamond":0}',
+      purchased BOOLEAN NOT NULL DEFAULT FALSE,
+      purchase_discount JSONB NOT NULL DEFAULT '{"emerald":0,"sapphire":0,"ruby":0,"diamond":0}',
       template_topic_id TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -120,7 +123,8 @@ export async function createSchema(pool: Pool): Promise<void> {
       total_xp INTEGER NOT NULL DEFAULT 0,
       current_streak INTEGER NOT NULL DEFAULT 0,
       longest_streak INTEGER NOT NULL DEFAULT 0,
-      last_study_date TEXT
+      last_study_date TEXT,
+      prestige_points INTEGER NOT NULL DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS app_settings (
@@ -216,6 +220,7 @@ export async function createSchema(pool: Pool): Promise<void> {
       version INTEGER NOT NULL DEFAULT 1,
       generated_by TEXT NOT NULL DEFAULT 'claude',
       status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('generating','active','archived')),
+      progress JSONB NOT NULL DEFAULT '{}',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
@@ -258,6 +263,25 @@ export async function createSchema(pool: Pool): Promise<void> {
       template_id TEXT NOT NULL REFERENCES curriculum_templates(id),
       assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived'))
+    );
+
+    CREATE TABLE IF NOT EXISTS gem_wallets (
+      user_id TEXT PRIMARY KEY REFERENCES users(id),
+      emerald INTEGER NOT NULL DEFAULT 0,
+      sapphire INTEGER NOT NULL DEFAULT 0,
+      ruby INTEGER NOT NULL DEFAULT 0,
+      diamond INTEGER NOT NULL DEFAULT 0,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS gem_transactions (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id),
+      gem_type TEXT NOT NULL CHECK (gem_type IN ('emerald','sapphire','ruby','diamond')),
+      amount INTEGER NOT NULL,
+      reason TEXT NOT NULL,
+      reference_id TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
   `);
 
@@ -318,5 +342,7 @@ export async function createSchema(pool: Pool): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_ct_checklist_topic ON ct_checklist_items(ct_topic_id);
     CREATE INDEX IF NOT EXISTS idx_user_curriculum_user ON user_curriculum_assignments(user_id);
     CREATE INDEX IF NOT EXISTS idx_user_curriculum_template ON user_curriculum_assignments(template_id);
+    CREATE INDEX IF NOT EXISTS idx_gem_tx_user ON gem_transactions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_gem_tx_created ON gem_transactions(created_at);
   `);
 }

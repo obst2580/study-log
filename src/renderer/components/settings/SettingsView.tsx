@@ -37,9 +37,7 @@ const SettingsView: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   const [currGrade, setCurrGrade] = useState<string>('');
-  const [generating, setGenerating] = useState(false);
-  const [generatedTemplateId, setGeneratedTemplateId] = useState<string | null>(null);
-  const [templateStatus, setTemplateStatus] = useState<string>('');
+  const [gradeStatus, setGradeStatus] = useState<string>('');
   const [applying, setApplying] = useState(false);
 
   useEffect(() => {
@@ -91,43 +89,21 @@ const SettingsView: React.FC = () => {
     }
   };
 
-  const handleGenerateCurriculum = async () => {
-    if (!currGrade) return;
-    setGenerating(true);
-    setTemplateStatus('generating');
+  const handleCheckGradeStatus = async (grade: string) => {
+    setCurrGrade(grade);
     try {
-      const result = await apiService.generateCurriculum(currGrade);
-      setGeneratedTemplateId(result.id);
-      if (result.status === 'active') {
-        setTemplateStatus('active');
-        setGenerating(false);
-        return;
-      }
-      // Poll for status
-      const poll = setInterval(async () => {
-        try {
-          const status = await apiService.getCurriculumStatus(result.id);
-          setTemplateStatus(status.status);
-          if (status.status === 'active' || status.status === 'archived') {
-            clearInterval(poll);
-            setGenerating(false);
-          }
-        } catch {
-          clearInterval(poll);
-          setGenerating(false);
-        }
-      }, 3000);
+      const status = await apiService.getGradeStatus(grade);
+      setGradeStatus(status.status);
     } catch {
-      message.error('커리큘럼 생성 실패');
-      setGenerating(false);
+      setGradeStatus('');
     }
   };
 
-  const handleApplyCurriculum = async () => {
-    if (!generatedTemplateId) return;
+  const handleApplyGrade = async () => {
+    if (!currGrade) return;
     setApplying(true);
     try {
-      await apiService.applyCurriculum(generatedTemplateId);
+      await apiService.applyGrade(currGrade);
       message.success('커리큘럼이 백로그에 추가되었습니다');
       loadSubjects();
       navigate('/curriculum');
@@ -208,32 +184,25 @@ const SettingsView: React.FC = () => {
               placeholder="학년 선택"
               style={{ width: '100%' }}
               value={currGrade || undefined}
-              onChange={setCurrGrade}
+              onChange={handleCheckGradeStatus}
               options={GRADES}
             />
+            {gradeStatus === 'generating' && (
+              <Text type="secondary">해당 학년의 커리큘럼이 준비 중입니다. 잠시 후 다시 시도해주세요.</Text>
+            )}
+            {gradeStatus === 'archived' && (
+              <Text type="warning">커리큘럼 생성에 실패했습니다. 관리자에게 문의하세요.</Text>
+            )}
             <Button
               type="primary"
               icon={<ThunderboltOutlined />}
-              loading={generating}
-              disabled={!currGrade}
-              onClick={handleGenerateCurriculum}
+              loading={applying}
+              disabled={!currGrade || gradeStatus !== 'active'}
+              onClick={handleApplyGrade}
               block
             >
-              커리큘럼 생성
+              칸반 보드에 적용
             </Button>
-            {templateStatus === 'generating' && (
-              <Text type="secondary">AI가 교과과정을 생성 중입니다... (약 30초~1분)</Text>
-            )}
-            {templateStatus === 'active' && generatedTemplateId && (
-              <Button
-                type="primary"
-                loading={applying}
-                onClick={handleApplyCurriculum}
-                block
-              >
-                칸반 보드에 적용
-              </Button>
-            )}
           </Space>
         </Card>
 

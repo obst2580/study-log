@@ -163,6 +163,77 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
       return { unlocked: count >= 3, progress: Math.min(count, 3), target: 3 };
     },
   },
+  {
+    key: 'first_gem',
+    title: '보석 수집 시작',
+    description: '첫 번째 보석을 획득했습니다',
+    icon: 'gem',
+    check: async (userId) => {
+      const pool = getPool();
+      const { rows } = await pool.query('SELECT COUNT(*) AS cnt FROM gem_transactions WHERE user_id = $1 AND amount > 0', [userId]);
+      const count = Number(rows[0].cnt);
+      return { unlocked: count >= 1, progress: Math.min(count, 1), target: 1 };
+    },
+  },
+  {
+    key: 'gem_collector_50',
+    title: '보석 수집가',
+    description: '총 50개의 보석을 획득했습니다',
+    icon: 'gem',
+    check: async (userId) => {
+      const pool = getPool();
+      const { rows } = await pool.query('SELECT COALESCE(SUM(amount), 0) AS total FROM gem_transactions WHERE user_id = $1 AND amount > 0', [userId]);
+      const total = Number(rows[0].total);
+      return { unlocked: total >= 50, progress: Math.min(total, 50), target: 50 };
+    },
+  },
+  {
+    key: 'first_purchase',
+    title: '첫 카드 구매',
+    description: '보석으로 첫 번째 카드를 구매했습니다',
+    icon: 'shopping-cart',
+    check: async (userId) => {
+      const pool = getPool();
+      const { rows } = await pool.query('SELECT COUNT(*) AS cnt FROM topics WHERE purchased = true AND subject_id IN (SELECT id FROM subjects WHERE user_id = $1)', [userId]);
+      const count = Number(rows[0].cnt);
+      return { unlocked: count >= 1, progress: Math.min(count, 1), target: 1 };
+    },
+  },
+  {
+    key: 'noble_visitor',
+    title: '귀족 방문',
+    description: '한 단원의 모든 토픽을 마스터했습니다',
+    icon: 'crown',
+    check: async (userId) => {
+      const pool = getPool();
+      const { rows } = await pool.query(`
+        SELECT COUNT(*) AS cnt FROM (
+          SELECT u.id FROM units u
+          JOIN subjects s ON s.id = u.subject_id AND s.user_id = $1
+          WHERE NOT EXISTS (
+            SELECT 1 FROM topics t WHERE t.unit_id = u.id AND t.column_name != 'mastered'
+          )
+          AND EXISTS (
+            SELECT 1 FROM topics t WHERE t.unit_id = u.id
+          )
+        ) completed_units
+      `, [userId]);
+      const count = Number(rows[0].cnt);
+      return { unlocked: count >= 1, progress: Math.min(count, 1), target: 1 };
+    },
+  },
+  {
+    key: 'prestige_10',
+    title: '명성 10',
+    description: '프레스티지 포인트 10점을 달성했습니다',
+    icon: 'award',
+    check: async (userId) => {
+      const pool = getPool();
+      const { rows } = await pool.query('SELECT prestige_points FROM user_stats WHERE user_id = $1', [userId]);
+      const points = rows.length > 0 ? (rows[0].prestige_points as number) : 0;
+      return { unlocked: points >= 10, progress: Math.min(points, 10), target: 10 };
+    },
+  },
 ];
 
 export async function checkAndAward(userId: string): Promise<string[]> {

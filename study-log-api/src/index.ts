@@ -2,6 +2,7 @@ import { config } from './config.js';
 import { initDatabase, closePool } from './database/index.js';
 import { createApp } from './app.js';
 import { startReviewScheduler } from './services/reviewScheduler.js';
+import { initializeAllTemplates } from './services/curriculumService.js';
 
 async function main() {
   console.log('StudyLog API starting...');
@@ -13,6 +14,11 @@ async function main() {
   const app = createApp();
 
   startReviewScheduler();
+
+  // 전체 학년 커리큘럼 템플릿 일괄 생성 (비동기, 서버 시작 블로킹 없음)
+  initializeAllTemplates()
+    .then(() => console.log('[Curriculum] Initialization dispatched for all grades'))
+    .catch((err) => console.error('[Curriculum] Initialization error:', err));
 
   const server = app.listen(config.port, () => {
     console.log(`StudyLog API running on http://localhost:${config.port}`);

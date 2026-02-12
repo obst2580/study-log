@@ -21,6 +21,7 @@ import analysisRouter from './routes/analysis.js';
 import reportsRouter from './routes/reports.js';
 import challengesRouter from './routes/challenges.js';
 import curriculumRouter from './routes/curriculum.js';
+import splendorRouter from './routes/splendor.js';
 
 export function createApp() {
   const app = express();
@@ -60,6 +61,7 @@ export function createApp() {
   app.use('/api/reports', reportsRouter);
   app.use('/api/challenges', challengesRouter);
   app.use('/api/curriculum', curriculumRouter);
+  app.use('/api/splendor', splendorRouter);
 
   app.use((_req, res) => {
     res.status(404).json({ error: 'Not found' });
